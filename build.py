@@ -1088,6 +1088,8 @@ Found a breach we missed, or a detail that's out of date?
 2. Run `python3 build.py`. This regenerates the markdown files, the JSON and CSV data, and the website. It uses only the standard library.
 3. Open a pull request.
 
+The social preview video (`site/og.mp4`, `site/og.png`) is rendered from the live hero animation: `cd tools && npm i && npm run og` (needs Node and ffmpeg).
+
 Keep claims honest: use `Claimed (unverified)` for threat-actor posts, and don't guess at root causes the victim hasn't disclosed.
 
 ## License
@@ -1169,7 +1171,8 @@ def render_site():
         "claims": LEAK_CLAIMS,
     }
     blob = json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
-    return (ROOT / "site_template.html").read_text().replace("/*DATA*/", blob)
+    html = (ROOT / "site_template.html").read_text().replace("/*DATA*/", blob)
+    return html.replace("/*SITE*/", SITE_URL.rstrip("/") + "/")
 
 
 def main():

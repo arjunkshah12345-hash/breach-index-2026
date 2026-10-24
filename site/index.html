@@ -7,6 +7,20 @@
 <meta name="description" content="Every notable company breach of Sep–Oct 2026: what happened, the root cause, and how it could have been prevented. Open source.">
 <meta property="og:title" content="Breach Index — Sep–Oct 2026">
 <meta property="og:description" content="Who got hacked, and how not to be next. 65 incidents, root causes, and prevention.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://breach-index-2026.vercel.app/">
+<meta property="og:image" content="https://breach-index-2026.vercel.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:video" content="https://breach-index-2026.vercel.app/og.mp4">
+<meta property="og:video:secure_url" content="https://breach-index-2026.vercel.app/og.mp4">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1200">
+<meta property="og:video:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Breach Index — Sep–Oct 2026">
+<meta name="twitter:description" content="Who got hacked, and how not to be next. 65 incidents, root causes, and prevention.">
+<meta name="twitter:image" content="https://breach-index-2026.vercel.app/og.png">
 <meta name="theme-color" content="#09090a">
 <style>
   :root {
@@ -275,6 +289,18 @@
     kbd { display: none; }
     .dz { -webkit-mask-size: 3px 3px; mask-size: 3px 3px; animation: none; }
   }
+  /* ?capture renders a fixed 1200x630 hero for tools/og-capture.mjs */
+  .capture *, .capture *::before, .capture *::after { animation: none !important; transition: none !important; }
+  .capture .enter, .capture h1 .line > span.enter { opacity: 1; transform: none; }
+  .capture .hero { min-height: 630px; height: 630px; }
+  .capture .hero-inner { padding: 40px 24px 0; }
+  .capture h1 { font-size: 80px; margin: 22px 0 20px; }
+  .capture .lede { font-size: 17px; }
+  .capture .actions { margin-top: 30px; }
+  .capture .cue, .capture nav .links { display: none; }
+  .capture nav { background: transparent; }
+  .capture nav .gh { margin-left: auto; }
+
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
     .enter, [data-reveal] { opacity: 1 !important; transform: none !important; }
@@ -480,7 +506,10 @@ function ditherCanvas(canvas, px, fn) {
 }
 
 // Run fn(t) every frame only while the element is on screen
+const CAPTURE = new URLSearchParams(location.search).has("capture");
+if (CAPTURE) document.documentElement.classList.add("capture");
 function whileVisible(el, fn) {
+  if (CAPTURE) { fn(0); return; }
   let run = false, t0 = performance.now();
   const loop = (now) => { fn((now - t0) / 1000); if (run) requestAnimationFrame(loop); };
   const set = (v) => { if (v && !run && !reduce) { run = true; requestAnimationFrame(loop); } else if (!v) run = false; };
@@ -496,19 +525,32 @@ function whileVisible(el, fn) {
   const cv = $("#field");
   let mx = 0.5, my = 0.42, tmx = 0.5, tmy = 0.42;
   const small = innerWidth < 640;
-  const nodes = Array.from({ length: small ? 4 : 8 }, () => ({ x: Math.random(), y: 0.12 + Math.random() * 0.76, p: Math.random() * 5, s: 3.5 + Math.random() * 3, last: 0 }));
+  // Capture mode loops every LOOP seconds: wave speeds and pulse periods divide it evenly,
+  // and pulse positions are a pure function of (node, cycle) so frame N == frame 0.
+  const LOOP = 12, W = (2 * Math.PI) / LOOP;
+  const hash = (a, b) => { const x = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return x - Math.floor(x); };
+  const speeds = CAPTURE ? [W, W, W] : [0.35, 0.27, 0.5];
+  const nodes = Array.from({ length: small ? 4 : 8 }, (_, i) => CAPTURE
+    ? { i, k: [2, 3, 4][i % 3], p: hash(i, 99) * LOOP, last: -1 }
+    : { x: Math.random(), y: 0.12 + Math.random() * 0.76, p: Math.random() * 5, s: 3.5 + Math.random() * 3, last: 0 });
+  if (CAPTURE) nodes.forEach((n) => (n.s = LOOP / n.k));
   addEventListener("pointermove", (e) => { const r = cv.getBoundingClientRect(); tmx = (e.clientX - r.left) / r.width; tmy = (e.clientY - r.top) / r.height; }, { passive: true });
-  whileVisible(cv, (t) => {
-    mx += (tmx - mx) * 0.06; my += (tmy - my) * 0.06;
+  const frame = (t) => {
+    if (CAPTURE) { mx = 0.5 + 0.34 * Math.sin(t * W); my = 0.46 + 0.22 * Math.sin(t * W * 2); }
+    else { mx += (tmx - mx) * 0.06; my += (tmy - my) * 0.06; }
     const ar = cv.clientWidth / Math.max(1, cv.clientHeight);
     for (const n of nodes) {
       const cyc = Math.floor((t + n.p) / n.s);
-      if (cyc !== n.last) { n.last = cyc; n.x = Math.random(); n.y = 0.12 + Math.random() * 0.76; }
+      if (cyc !== n.last) {
+        n.last = cyc;
+        if (CAPTURE) { const c = ((cyc % n.k) + n.k) % n.k; n.x = hash(n.i, c); n.y = 0.12 + hash(c, n.i + 7) * 0.76; }
+        else { n.x = Math.random(); n.y = 0.12 + Math.random() * 0.76; }
+      }
       n.ph = ((t + n.p) % n.s) / n.s;
     }
     ditherCanvas(cv, small ? 3 : 4, (nx, ny) => {
       const x = nx * ar;
-      let v = 0.5 + 0.28 * Math.sin(x * 5.2 + t * 0.35) * Math.cos(ny * 4.4 - t * 0.27) + 0.22 * Math.sin((x + ny) * 8 - t * 0.5);
+      let v = 0.5 + 0.28 * Math.sin(x * 5.2 + t * speeds[0]) * Math.cos(ny * 4.4 - t * speeds[1]) + 0.22 * Math.sin((x + ny) * 8 - t * speeds[2]);
       const dx = (nx - 0.5) * ar * 1.2, dy = (ny - 0.48) * 1.7;
       const mask = clamp((Math.sqrt(dx * dx + dy * dy) - 0.34) / 0.55);
       v *= 0.44 * mask;
@@ -519,11 +561,13 @@ function whileVisible(el, fn) {
         const ndx = (nx - n.x) * ar, ndy = ny - n.y, nd = Math.sqrt(ndx * ndx + ndy * ndy);
         const band = Math.max(0, 1 - Math.abs(nd - n.ph * (small ? 0.18 : 0.3)) / 0.013) * (1 - n.ph) * mask;
         if (band > 0.04) { v = Math.max(v, band * 0.95); tone = n.ph > 0.55 ? 3 : 2; }
-        else if (nd < 0.007 && n.ph < 0.8) { v = 1; tone = 2; }
+        else if (nd < 0.007 && n.ph < 0.8 && mask > 0.35) { v = 1; tone = 2; }
       }
       return [v, tone];
     });
-  });
+  };
+  whileVisible(cv, frame);
+  if (CAPTURE) window.__heroFrame = (t) => frame(((t % LOOP) + LOOP) % LOOP);
 })();
 
 // ---------- nav, repo links, dates ----------
