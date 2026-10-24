@@ -1,0 +1,718 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breach Index — Sep–Oct 2026</title>
+<meta name="description" content="Every notable company breach of Sep–Oct 2026: what happened, the root cause, and how it could have been prevented. Open source.">
+<meta property="og:title" content="Breach Index — Sep–Oct 2026">
+<meta property="og:description" content="Who got hacked, and how not to be next. 65 incidents, root causes, and prevention.">
+<meta name="theme-color" content="#09090a">
+<style>
+  :root {
+    --bg: #09090a;
+    --bg-2: #101012;
+    --bg-3: #151518;
+    --line: #1c1c20;
+    --line-2: #2a2a2f;
+    --text: #ececea;
+    --soft: #c4c4c0;
+    --muted: #8a8a90;
+    --faint: #57575e;
+    --accent: #ff4d4f;
+    --warn: #e0b25c;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Berkeley Mono", Menlo, monospace;
+    --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+    --ease: cubic-bezier(.2, .7, .2, 1);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  ::selection { background: var(--accent); color: #fff; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- nav ---------- */
+  nav {
+    position: fixed; inset: 0 0 auto; z-index: 20; height: 56px;
+    transition: background .3s, border-color .3s; border-bottom: 1px solid transparent;
+  }
+  nav.solid { background: rgba(9,9,10,.78); backdrop-filter: blur(14px) saturate(1.2); border-color: var(--line); }
+  nav .wrap { display: flex; align-items: center; height: 100%; gap: 28px; max-width: 1180px; }
+  .brand { font: 500 13px var(--mono); display: flex; align-items: center; gap: 10px; letter-spacing: .01em; }
+  .brand i { width: 10px; height: 10px; display: block; background: var(--accent); -webkit-mask: var(--px) 0 0 / 4px 4px; mask: var(--px) 0 0 / 4px 4px; animation: blink 2.4s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: .35; } }
+  nav .links { display: flex; gap: 24px; margin-left: auto; }
+  nav .links a { color: var(--muted); font-size: 13px; transition: color .2s; }
+  nav .links a:hover { color: var(--text); }
+  .gh {
+    display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text);
+    border: 1px solid var(--line-2); padding: 6px 12px; border-radius: 999px; transition: border-color .2s, background .2s;
+  }
+  .gh:hover { border-color: var(--muted); background: var(--bg-3); }
+  .gh svg, .btn svg { width: 15px; height: 15px; flex: none; }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; min-height: 100svh; display: grid; place-items: center; text-align: center; overflow: hidden; isolation: isolate; }
+  #field { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; image-rendering: pixelated; }
+  .hero::after { content: ""; position: absolute; inset: auto 0 0; height: 30%; background: linear-gradient(transparent, var(--bg)); z-index: -1; pointer-events: none; }
+  .hero-inner { padding: 120px 24px 140px; max-width: 900px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 10px; border-radius: 999px;
+    border: 1px solid var(--line-2); background: rgba(16,16,18,.7); backdrop-filter: blur(6px);
+    font: 12px var(--mono); color: var(--muted); letter-spacing: .02em;
+  }
+  .pill b { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: ping 2s infinite; }
+  @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(255,77,79,.55); } 80%, 100% { box-shadow: 0 0 0 9px rgba(255,77,79,0); } }
+  h1 {
+    font-size: clamp(44px, 8.4vw, 104px); line-height: .98; letter-spacing: -.045em; font-weight: 500;
+    margin: 28px 0 26px;
+  }
+  h1 .line { display: block; overflow: hidden; padding-bottom: .06em; }
+  h1 .line > span { display: inline-block; }
+  h1 .dim { color: #4a4a50; }
+  .dz { color: var(--accent); -webkit-mask: var(--dz) 0 0 / 4px 4px; mask: var(--dz) 0 0 / 4px 4px; animation: crawl 1.2s steps(4) infinite; }
+  @keyframes crawl { to { -webkit-mask-position: 4px 0; mask-position: 4px 0; } }
+  .lede { color: var(--muted); font-size: clamp(16px, 1.6vw, 19px); max-width: 52ch; margin: 0 auto; }
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 22px; border-radius: 999px;
+    font-size: 14px; font-weight: 500; transition: transform .25s var(--ease), background .2s, border-color .2s;
+  }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { background: var(--text); color: var(--bg); }
+  .btn.primary:hover { background: #fff; }
+  .btn .arr { transition: transform .25s var(--ease); }
+  .btn:hover .arr { transform: translateY(2px); }
+  .btn.ghost { border: 1px solid var(--line-2); background: rgba(9,9,10,.6); backdrop-filter: blur(6px); }
+  .btn.ghost:hover { border-color: var(--muted); }
+  .cue { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font: 11px var(--mono); color: var(--faint); letter-spacing: .14em; text-transform: uppercase; display: grid; justify-items: center; gap: 10px; }
+  .cue i { width: 1px; height: 36px; background: linear-gradient(var(--faint), transparent); animation: drip 2.2s var(--ease) infinite; transform-origin: top; }
+  @keyframes drip { 0% { transform: scaleY(0); opacity: 1; } 60% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
+
+  /* entrance */
+  .enter { opacity: 0; transform: translateY(14px); animation: up .9s var(--ease) forwards; animation-delay: var(--d, 0s); }
+  .cue.enter { transform: translate(-50%, 14px); animation-name: upc; }
+  h1 .line > span.enter { transform: translateY(105%); opacity: 1; animation-name: rise; animation-duration: 1.1s; }
+  @keyframes up { to { opacity: 1; transform: none; } }
+  @keyframes upc { to { opacity: 1; transform: translate(-50%, 0); } }
+  @keyframes rise { to { transform: none; } }
+
+  /* ---------- stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stat { padding: 34px 28px; text-align: center; }
+  .stat + .stat { border-left: 1px solid var(--line); }
+  .stat b { display: block; font-size: clamp(28px, 3.6vw, 42px); font-weight: 500; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .stat small { color: var(--muted); font-size: 13px; }
+
+  /* ---------- sections ---------- */
+  section { padding: 120px 0; border-bottom: 1px solid var(--line); }
+  .head { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 48px; flex-wrap: wrap; }
+  .kicker { font: 12px var(--mono); color: var(--muted); letter-spacing: .1em; text-transform: uppercase; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .kicker i { width: 10px; height: 10px; background: var(--muted); -webkit-mask: var(--px) 0 0 / 4px 4px; mask: var(--px) 0 0 / 4px 4px; }
+  h2 { font-size: clamp(28px, 3.8vw, 44px); line-height: 1.05; letter-spacing: -.035em; font-weight: 500; margin: 0; max-width: 20ch; }
+  h2 .dim { color: var(--faint); }
+  .head p { color: var(--muted); max-width: 40ch; margin: 0; font-size: 14px; }
+
+  /* reveal */
+  [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity .8s var(--ease), transform .8s var(--ease); transition-delay: var(--d, 0s); }
+  [data-reveal].in { opacity: 1; transform: none; }
+
+  /* why */
+  .why { list-style: none; padding: 0; margin: 0; counter-reset: w; }
+  .why li { display: grid; grid-template-columns: 64px 1fr 1fr; gap: 28px; padding: 28px 0; border-top: 1px solid var(--line); counter-increment: w; position: relative; }
+  .why li::before { content: "0" counter(w); font: 13px var(--mono); color: var(--faint); padding-top: 5px; }
+  .why li::after { content: ""; position: absolute; left: 0; top: -1px; height: 1px; width: 0; background: var(--accent); transition: width 1.2s var(--ease) .3s; }
+  .why li.in::after { width: 64px; }
+  .why h3 { margin: 0 0 6px; font-size: 20px; font-weight: 500; letter-spacing: -.02em; }
+  .why p { margin: 0; color: var(--muted); font-size: 14px; }
+  .why .fix { color: var(--soft); align-self: start; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-2); }
+  .why .fix::before { content: "FIX"; display: block; color: var(--accent); font: 11px var(--mono); letter-spacing: .1em; margin-bottom: 4px; }
+
+  /* charts */
+  .charts { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; }
+  .panel { border: 1px solid var(--line); border-radius: 14px; background: var(--bg-2); padding: 26px; }
+  .panel h4 { margin: 0 0 4px; font-size: 15px; font-weight: 500; }
+  .panel .sub { color: var(--faint); font: 12px var(--mono); margin-bottom: 22px; }
+  .bars { display: grid; gap: 12px; }
+  .bar { display: grid; grid-template-columns: 160px 1fr 30px; gap: 14px; align-items: center; font-size: 13px; color: var(--muted); cursor: pointer; transition: color .2s; }
+  .bar:hover { color: var(--text); }
+  .bar canvas { width: 100%; height: 18px; display: block; }
+  .bar span:last-child { font: 12px var(--mono); text-align: right; color: var(--soft); }
+  .cols canvas { width: 100%; height: 222px; display: block; }
+  .cols .axis { display: flex; justify-content: space-between; font: 11px var(--mono); color: var(--faint); margin-top: 10px; }
+
+  /* controls */
+  .controls { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; position: sticky; top: 66px; z-index: 5; }
+  .search-wrap { flex: 1; position: relative; }
+  .search-wrap svg { position: absolute; left: 14px; top: 50%; translate: 0 -50%; width: 15px; height: 15px; color: var(--faint); }
+  .search {
+    width: 100%; background: rgba(16,16,18,.88); backdrop-filter: blur(10px); border: 1px solid var(--line-2); color: var(--text);
+    font: 14px var(--sans); padding: 12px 14px 12px 40px; border-radius: 10px; outline: none; transition: border-color .2s, box-shadow .2s;
+  }
+  .search:focus { border-color: var(--muted); box-shadow: 0 0 0 4px rgba(255,255,255,.04); }
+  .search::placeholder { color: var(--faint); }
+  kbd { position: absolute; right: 12px; top: 50%; translate: 0 -50%; font: 11px var(--mono); color: var(--faint); border: 1px solid var(--line-2); border-radius: 5px; padding: 1px 6px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+  .chip {
+    background: transparent; border: 1px solid var(--line); color: var(--muted);
+    font: 12px var(--sans); padding: 7px 12px; border-radius: 999px; cursor: pointer; transition: color .2s, border-color .2s, background .2s;
+  }
+  .chip:hover { color: var(--text); border-color: var(--line-2); }
+  .chip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .chip span { opacity: .5; margin-left: 5px; font-family: var(--mono); }
+  .resultcount { font: 12px var(--mono); color: var(--faint); margin: 0 0 10px; }
+
+  /* list */
+  .list { border-top: 1px solid var(--line); }
+  .row { border-bottom: 1px solid var(--line); position: relative; }
+  .row::before { content: ""; position: absolute; left: -16px; top: 22px; width: 2px; height: 0; background: var(--accent); transition: height .3s var(--ease); }
+  .row:hover::before, .row.open::before { height: 22px; }
+  .row > button {
+    all: unset; box-sizing: border-box; width: 100%; cursor: pointer;
+    display: grid; grid-template-columns: 84px 1fr 200px 112px 18px; gap: 20px; align-items: baseline; padding: 18px 0;
+  }
+  .row > button:focus-visible { outline: 1px solid var(--line-2); outline-offset: 4px; border-radius: 4px; }
+  .date { font: 12px var(--mono); color: var(--faint); font-variant-numeric: tabular-nums; }
+  .name { font-weight: 500; transition: transform .3s var(--ease); }
+  .row:hover .name { transform: translateX(4px); }
+  .name small { display: block; color: var(--faint); font-weight: 400; font-size: 13px; margin-top: 2px; }
+  .type { font-size: 13px; color: var(--muted); }
+  .status { font: 11px var(--mono); color: var(--muted); display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--faint); flex: none; }
+  .status.confirmed::before { background: var(--accent); }
+  .status.partial::before { background: var(--warn); }
+  .status.claimed::before { background: transparent; border: 1px solid var(--faint); }
+  .plus { color: var(--faint); font-family: var(--mono); transition: transform .3s var(--ease), color .2s; text-align: right; }
+  .row.open .plus { transform: rotate(45deg); color: var(--text); }
+  .detail { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s var(--ease); }
+  .row.open .detail { grid-template-rows: 1fr; }
+  .detail > div { overflow: hidden; visibility: hidden; transition: visibility .4s; }
+  .row.open .detail > div { visibility: visible; transition: none; }
+  .detail-inner { padding: 4px 0 40px 104px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px; opacity: 0; transform: translateY(-6px); transition: opacity .35s, transform .35s var(--ease); }
+  .row.open .detail-inner { opacity: 1; transform: none; transition-delay: .08s; }
+  .detail h4 { margin: 0 0 8px; font: 11px var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: .1em; font-weight: 400; }
+  .detail p { margin: 0; color: var(--soft); font-size: 14px; }
+  .detail ul { margin: 0; padding: 0; list-style: none; }
+  .detail li { font-size: 14px; color: var(--soft); padding: 8px 0 8px 20px; position: relative; border-top: 1px solid var(--line); }
+  .detail li:first-child { border-top: 0; padding-top: 0; }
+  .detail li::before { content: ""; position: absolute; left: 2px; top: 16px; width: 6px; height: 6px; background: var(--muted); -webkit-mask: var(--px) 0 0 / 2px 2px; mask: var(--px) 0 0 / 2px 2px; }
+  .detail li:first-child::before { top: 8px; }
+  .detail .full { grid-column: 1 / -1; }
+  .detail .rc { padding: 16px 18px; border-left: 2px solid var(--accent); background: linear-gradient(90deg, rgba(255,77,79,.06), transparent 70%); }
+  .detail .baseline li { color: var(--muted); font-size: 13px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 24px; font: 12px var(--mono); color: var(--faint); }
+  .meta b { color: var(--muted); font-weight: 400; }
+  .sources a { font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--line-2); transition: color .2s, border-color .2s; }
+  .sources a:hover { color: var(--text); border-color: var(--text); }
+  .sources div + div { margin-top: 6px; }
+  .empty { padding: 56px 0; color: var(--faint); text-align: center; font-size: 14px; }
+
+  /* campaigns */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .card {
+    padding: 28px 84px 28px 28px; border: 1px solid var(--line); border-radius: 14px; background: var(--bg-2); position: relative; overflow: hidden;
+    transition: border-color .3s, transform .4s var(--ease), opacity .8s var(--ease);
+  }
+  .card.in:hover { border-color: var(--line-2); transform: translateY(-3px); }
+  .card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .card canvas { position: absolute; right: 0; top: 0; width: 120px; height: 100%; opacity: .55; pointer-events: none; }
+  .card > *:not(canvas) { position: relative; }
+  .card h3 { margin: 0 0 6px; font-size: 18px; font-weight: 500; letter-spacing: -.02em; max-width: 30ch; }
+  .card .when { font: 12px var(--mono); color: var(--faint); margin-bottom: 16px; }
+  .card p { margin: 0 0 12px; color: var(--muted); font-size: 14px; max-width: 62ch; }
+  .card p b { color: var(--text); font-weight: 500; }
+
+  /* playbook */
+  .top10 { list-style: none; padding: 0; margin: 0; counter-reset: t; display: grid; grid-template-columns: 1fr 1fr; column-gap: 48px; }
+  .top10 li { counter-increment: t; padding: 20px 0 20px 48px; position: relative; border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+  .top10 li::before { content: counter(t, decimal-leading-zero); position: absolute; left: 0; top: 21px; font: 12px var(--mono); color: var(--accent); }
+  .top10 b { color: var(--text); font-weight: 500; display: block; margin-bottom: 4px; font-size: 15px; }
+
+  /* claims */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font: 11px var(--mono); color: var(--faint); text-transform: uppercase; letter-spacing: .1em; font-weight: 400; padding: 0 0 14px; }
+  td { padding: 12px 0; border-top: 1px solid var(--line); color: var(--muted); transition: color .2s; }
+  tr:hover td { color: var(--text); }
+  td:first-child { font-family: var(--mono); font-size: 12px; color: var(--faint); width: 120px; }
+  td:nth-child(2) { color: var(--soft); }
+  td:last-child { font-family: var(--mono); font-size: 12px; }
+
+  /* cta + footer */
+  .oss { text-align: center; padding: 150px 0; position: relative; overflow: hidden; isolation: isolate; border-bottom: 1px solid var(--line); }
+  .oss canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; image-rendering: pixelated; }
+  .oss h2 { margin: 0 auto 18px; max-width: 18ch; }
+  .oss p { color: var(--muted); max-width: 50ch; margin: 0 auto; }
+  .oss code { font: 13px ui-monospace, Menlo, monospace; color: var(--soft); background: var(--bg-3); border: 1px solid var(--line-2); padding: 3px 8px; border-radius: 6px; }
+  footer { padding: 40px 0 64px; color: var(--faint); font-size: 13px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  footer a { color: var(--muted); border-bottom: 1px solid var(--line-2); }
+  footer a:hover { color: var(--text); }
+
+  @media (max-width: 860px) {
+    .wrap { padding: 0 20px; }
+    nav .links { display: none; }
+    nav .gh { margin-left: auto; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(3) { border-left: 0; }
+    .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+    section { padding: 88px 0; }
+    .why li { grid-template-columns: 40px 1fr; }
+    .why li .fix { grid-column: 2; }
+    .charts { grid-template-columns: 1fr; }
+    .bar { grid-template-columns: 112px 1fr 26px; }
+    .row > button { grid-template-columns: 1fr 18px; gap: 4px 12px; }
+    .row .date, .row .name, .row .type, .row .status { grid-column: 1; }
+    .row .date { grid-row: 1; }
+    .row .plus { grid-column: 2; grid-row: 1 / span 2; }
+    .row::before { display: none; }
+    .detail-inner { padding-left: 0; grid-template-columns: 1fr; }
+    .grid, .top10 { grid-template-columns: 1fr; }
+    .card:last-child:nth-child(odd) { grid-column: auto; }
+    kbd { display: none; }
+    .dz { -webkit-mask-size: 3px 3px; mask-size: 3px 3px; animation: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    .enter, [data-reveal] { opacity: 1 !important; transform: none !important; }
+    .cue.enter { transform: translateX(-50%) !important; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="gh" viewBox="0 0 16 16"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></symbol>
+</svg>
+
+<nav id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><i></i>breach-index</a>
+    <div class="links">
+      <a href="#why">Why</a>
+      <a href="#numbers">Numbers</a>
+      <a href="#incidents">Incidents</a>
+      <a href="#campaigns">Campaigns</a>
+      <a href="#playbook">Prevention</a>
+      <a href="#claims">Claims</a>
+    </div>
+    <a class="gh repo" href="#" target="_blank" rel="noopener"><svg><use href="#gh"/></svg>Open source</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <canvas id="field" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <span class="pill enter" style="--d:.1s"><b></b><span id="asof"></span></span>
+    <h1>
+      <span class="line"><span class="enter" style="--d:.2s">Who got <span class="dz">hacked</span>,</span></span>
+      <span class="line"><span class="enter dim" style="--d:.32s">and how not to</span></span>
+      <span class="line"><span class="enter dim" style="--d:.44s">be next.</span></span>
+    </h1>
+    <p class="lede enter" style="--d:.7s">Every notable company breach of the last two months, with what happened, the root cause, and the specific controls that would have stopped it.</p>
+    <div class="actions enter" style="--d:.85s">
+      <a class="btn primary" href="#incidents">Browse incidents <span class="arr">↓</span></a>
+      <a class="btn ghost repo" href="#" target="_blank" rel="noopener"><svg><use href="#gh"/></svg>View on GitHub</a>
+    </div>
+  </div>
+  <div class="cue enter" style="--d:1.2s"><i></i>Scroll</div>
+</header>
+
+<div class="wrap"><div class="stats" id="stats"></div></div>
+
+<section id="why">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div><div class="kicker"><i></i>01 · Patterns</div><h2>Why it keeps happening. <span class="dim">Five patterns behind almost every breach.</span></h2></div>
+    </div>
+    <ol class="why" id="whyList"></ol>
+  </div>
+</section>
+
+<section id="numbers">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div><div class="kicker"><i></i>02 · Numbers</div><h2>How they got in. <span class="dim">And when it came out.</span></h2></div>
+      <p>Click a bar to filter the incident list by that attack type.</p>
+    </div>
+    <div class="charts">
+      <div class="panel" data-reveal>
+        <h4>Entry vector</h4><div class="sub" id="vecSub"></div>
+        <div class="bars" id="bars"></div>
+      </div>
+      <div class="panel cols" data-reveal style="--d:.1s">
+        <h4>Incidents per week</h4><div class="sub">By incident or disclosure date</div>
+        <canvas id="weeks"></canvas>
+        <div class="axis" id="weekAxis"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="incidents">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div><div class="kicker"><i></i>03 · Index</div><h2>Incidents. <span class="dim">Open any row for root cause and prevention.</span></h2></div>
+    </div>
+    <div class="controls">
+      <div class="search-wrap">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
+        <input class="search" id="q" type="search" placeholder="Search company, sector, attacker…" autocomplete="off" aria-label="Search incidents">
+        <kbd>/</kbd>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <p class="resultcount" id="resultcount"></p>
+    <div class="list" id="list"></div>
+  </div>
+</section>
+
+<section id="campaigns">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div><div class="kicker"><i></i>04 · Campaigns</div><h2>Hitting many at once. <span class="dim">Operations with dozens of victims.</span></h2></div>
+    </div>
+    <div class="grid" id="campaignGrid"></div>
+  </div>
+</section>
+
+<section id="playbook">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div><div class="kicker"><i></i>05 · Prevention</div><h2>If you only do ten things. <span class="dim">Roughly in order of payoff.</span></h2></div>
+    </div>
+    <ol class="top10" id="top10"></ol>
+  </div>
+</section>
+
+<section id="claims">
+  <div class="wrap">
+    <div class="head" data-reveal>
+      <div><div class="kicker"><i></i>06 · Claims</div><h2>Unverified leak-site claims.</h2></div>
+      <p>Organisations listed by ransomware groups. Gangs exaggerate and recycle data, so treat these as claims until the company confirms.</p>
+    </div>
+    <table data-reveal>
+      <thead><tr><th>Listed</th><th>Organisation</th><th>Group</th></tr></thead>
+      <tbody id="claimsBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<div class="oss">
+  <canvas id="ossField" aria-hidden="true"></canvas>
+  <div class="wrap" data-reveal>
+    <div class="kicker" style="justify-content:center"><i></i>Open source</div>
+    <h2>Found a breach we missed?</h2>
+    <p>The whole index is one Python file of data. Fork it, add an incident, run <code>python3 build.py</code>, and open a pull request.</p>
+    <div class="actions">
+      <a class="btn primary repo" href="#" target="_blank" rel="noopener"><svg><use href="#gh"/></svg>Contribute on GitHub</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>Compiled <span id="asof2"></span> from public reporting. Details change as investigations continue.</span>
+    <span><a class="repo" href="#" target="_blank" rel="noopener">GitHub</a> · MIT licensed</span>
+  </div>
+</footer>
+
+<script>
+const DATA = {"asOf": "2026-10-24", "repo": "https://github.com/arjunkshah12345-hash/breach-index-2026", "incidents": [{"name": "Educational Testing Service (ETS) / California Dept. of Education", "slug": "ets-california-students", "sector": "Education", "country": "US", "date": "2026-10-19", "date_note": "access May 22 to Sep 18; reported Oct 19", "category": "credentials", "status": "Confirmed", "attacker": "Unknown", "impact": "Data on millions of current and former California public-school students (anyone enrolled in the last three school years at least; 5.7M+ enrolled in 2025-26 alone): names, Statewide Student IDs, DOB, home address, demographics, disability and program data, test scores. No SSNs or financial data.", "what": "An unauthorized party used compromised login credentials to access an SFTP file-transfer site run by ETS, the state's testing contractor, and copied files repeatedly over about four months.", "root_cause": "Valid credentials on an internet-facing SFTP server, apparently with no second factor. The long dwell time points to no alerting on bulk downloads.", "prevention": ["Put SFTP behind SSO with phishing-resistant MFA, or use key-based auth with IP allow-listing for named partner systems only.", "Don't leave years of student records sitting on a transfer site. Files should be picked up and then auto-deleted.", "Alert on download volume per account; four months of repeated copying should have tripped something.", "Contracts with state testing vendors should require MFA, logging and retention limits, with audits."], "sources": [{"title": "Malwarebytes: Millions of California students' data stolen", "url": "https://www.malwarebytes.com/blog/data-breaches/2026/10/millions-of-california-students-sensitive-data-stolen-in-breach"}]}, {"name": "Nikkei", "slug": "nikkei", "sector": "Media", "country": "Japan", "date": "2026-10-07", "date_note": "unauthorized access Oct 7", "category": "credentials", "status": "Confirmed", "attacker": "Unknown", "impact": "About 1.83M records accessed: about 150,000 with personal information, about 120,000 with email addresses. No card data. No misuse found as of Oct 16.", "what": "Attackers got into a cloud service Nikkei used for system development.", "root_cause": "Previously compromised credentials were still valid, and the development environment held real personal data.", "prevention": ["Rotate all credentials after any prior compromise, including those for dev and test tooling.", "Use masked or synthetic data in development environments, not production personal data.", "Require SSO and MFA on developer SaaS, and watch infostealer feeds for employee credentials."], "sources": [{"title": "CyberNexora: Black October 2026, 14 cyber incidents", "url": "https://blog.cybernexora.com/black-october-2026-cybersecurity-incidents/"}]}, {"name": "Florida Highway Safety & Motor Vehicles (DAVID database)", "slug": "florida-flhsmv-david", "sector": "Government", "country": "US", "date": "2026-09-12", "date_note": "claimed Sep 8, confirmed Sep 12", "category": "credentials", "status": "Confirmed", "attacker": "ShinyHunters", "impact": "ShinyHunters claimed 200,000+ driver records. FLHSMV confirmed the breach but did not state its scope.", "what": "Attackers logged into the DAVID driver and motor-vehicle database with a Plant City police officer's credentials.", "root_cause": "Law-enforcement credentials were stored improperly on a personal device, and the database accepted them without device or MFA checks strong enough to stop reuse.", "prevention": ["Phishing-resistant MFA and managed-device (conditional access) checks on any law-enforcement data system.", "Per-user query-volume limits and alerts; a single officer pulling bulk records is anomalous.", "Ban credential storage on personal devices, and enforce it with technical controls, not only policy."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}, {"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Veradigm", "slug": "veradigm", "sector": "Healthcare IT", "country": "US", "date": "2026-09-09", "date_note": "reported Sep 9", "category": "credentials", "status": "Confirmed", "attacker": "Unknown", "impact": "Patient information downloaded from some healthcare customers, including SSNs in some cases. Clinical data not compromised.", "what": "An unauthorized party used stolen credentials belonging to a third-party vendor to call a Veradigm API and download patient data.", "root_cause": "A vendor API credential that was long-lived and broadly scoped, with no anomaly detection on bulk pulls.", "prevention": ["Issue vendor API credentials scoped to the minimum data, IP-restricted, short-lived, and bound with mTLS where possible.", "Rate-limit and alert on bulk record retrieval per client.", "Require vendors to protect the credentials you issue them (secret managers, MFA on their side)."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Dropbox users (via Lenovo ID email-verification flaw)", "slug": "dropbox-lenovo-id", "sector": "Cloud storage", "country": "Global", "date": "2026-09-02", "date_note": "reported Sep 2", "category": "credentials", "status": "Reported (secondary sources)", "attacker": "Unknown", "impact": "About 5,000 Dropbox accounts accessed without passwords; some files viewed and downloaded.", "what": "Attackers abused a Lenovo email-verification flaw to create Lenovo IDs claiming victims' email addresses, then signed into the matching Dropbox accounts via federated login.", "root_cause": "An identity-federation logic flaw: a relying party trusted an email claim from an identity provider that had not actually verified the email.", "prevention": ["Relying parties should link federated accounts on the IdP's immutable subject ID, never on email alone, and require email_verified.", "Require step-up re-authentication before linking a new federated login to an existing account.", "IdPs must verify email ownership before asserting it."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "IDC Frontier (IDCF Cloud, SoftBank)", "slug": "idc-frontier-idcf-cloud", "sector": "Cloud / data centre", "country": "Japan", "date": "2026-10-07", "date_note": "ransomware Oct 7", "category": "third-party", "status": "Confirmed", "attacker": "Not disclosed", "impact": "495 companies and local governments affected. Virtual servers in four availability zones stopped and could not restart, and customers were warned they might have to restore from their own backups. Downstream victims include JR East / View Card (about 6.09M records), Nissui logistics, and Ibaraki Prefecture and prefectural police websites.", "what": "Ransomware took down part of IDCF Cloud. The provider isolated the affected region. It later said no data was taken from customer VMs, which conflicts with some customers' notices.", "root_cause": "Entry vector not disclosed. Because it hit many tenants at once, the attackers most likely reached the shared management or virtualisation layer rather than individual tenants.", "prevention": ["Providers: isolate the hypervisor and management plane on a separate network with phishing-resistant MFA and just-in-time admin access, and keep immutable backups of tenant volumes.", "Customers: keep your own backups outside the provider, and test a restore into a second region or provider.", "Customers: contracts should require breach notice within hours and spell out recovery responsibilities."], "sources": [{"title": "BleepingComputer: Ransomware attack disrupts Japan's IDCF Cloud", "url": "https://www.bleepingcomputer.com/news/security/ransomware-attack-disrupts-japans-idcf-cloud-used-by-govt-clients/"}, {"title": "Cybernews: Cyberattack on Japanese cloud firm hits railways, police, food suppliers", "url": "https://cybernews.com/security/japanese-cloud-cyberattack-railways-police-495-organizations-idcf/"}, {"title": "Rescana: IDCF Cloud ransomware amid wider Japan attack wave", "url": "https://www.rescana.com/post/idcf-cloud-ransomware-japan-attack-wave-october-2026"}, {"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "East Japan Railway (JR East) / View Card", "slug": "jr-east-view-card", "sector": "Transport", "country": "Japan", "date": "2026-10-07", "date_note": "via IDCF Cloud attack", "category": "third-party", "status": "Confirmed", "attacker": "Not disclosed", "impact": "Email-delivery data covering about 6.09M accounts may have been compromised.", "what": "JR East and its card subsidiary were hit through the ransomware attack on their cloud host, IDC Frontier.", "root_cause": "Concentration risk: customer email-delivery data was hosted with a single cloud provider that was then compromised.", "prevention": ["Keep only the data a vendor needs for the task (for example, hashed or tokenised identifiers instead of full contact lists where possible).", "Map and tier cloud-provider dependencies, and require isolation and backup guarantees."], "sources": [{"title": "BleepingComputer: Ransomware attack disrupts Japan's IDCF Cloud", "url": "https://www.bleepingcomputer.com/news/security/ransomware-attack-disrupts-japans-idcf-cloud-used-by-govt-clients/"}, {"title": "Cybernews: Cyberattack on Japanese cloud firm hits railways, police, food suppliers", "url": "https://cybernews.com/security/japanese-cloud-cyberattack-railways-police-495-organizations-idcf/"}, {"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Nissui", "slug": "nissui", "sector": "Food processing", "country": "Japan", "date": "2026-10-07", "date_note": "via IDCF Cloud attack", "category": "third-party", "status": "Confirmed", "attacker": "Not disclosed", "impact": "Its logistics subsidiary stopped shipping at all sites, with partial restart on Oct 9.", "what": "Systems hosted in a third-party data centre (IDCF) went down in the ransomware attack.", "root_cause": "Business-critical logistics depended on a single hosting provider with no failover.", "prevention": ["Run business-continuity plans for losing a hosting provider, including manual shipping procedures.", "Keep failover or restore capability in a second environment for order and logistics systems."], "sources": [{"title": "BleepingComputer: Ransomware attack disrupts Japan's IDCF Cloud", "url": "https://www.bleepingcomputer.com/news/security/ransomware-attack-disrupts-japans-idcf-cloud-used-by-govt-clients/"}, {"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Citizen Watch (via Scala Communications)", "slug": "citizen-watch-scala", "sector": "Manufacturing / IT vendor", "country": "Japan", "date": "2026-10-05", "date_note": "reported Oct 5-6", "category": "third-party", "status": "Confirmed", "attacker": "Unknown", "impact": "Scala: up to 713,126 customer-inquiry records across 5+ client companies. Citizen: about 100,000 customers, including names, addresses, phone numbers, emails, and bank and credit-card information.", "what": "Attackers accessed the FAQ and inquiry-management system Scala Communications runs for client companies.", "root_cause": "An outsourced customer-support system held sensitive financial data and was compromised (vector not disclosed).", "prevention": ["Never let payment or bank details sit in support-ticket or FAQ systems; redact them on intake.", "Purge support-inquiry data on a retention schedule.", "Assess vendor security for any outsourced system that holds customer PII."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Daiwa Securities Group", "slug": "daiwa-securities", "sector": "Finance", "country": "Japan", "date": "2026-10-05", "date_note": "reported around Oct 5", "category": "third-party", "status": "Confirmed", "attacker": "Unknown", "impact": "More than 110,000 clients' names and account numbers.", "what": "An external vendor was breached and Daiwa client data was exposed.", "root_cause": "Third-party vendor compromise (details not disclosed).", "prevention": ["Share only the fields a vendor needs, and tokenise account numbers where possible.", "Require vendor breach notification and audit rights."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Daiichi Kosho (via Nippon Columbia)", "slug": "daiichi-kosho", "sector": "Entertainment", "country": "Japan", "date": "2026-10-01", "date_note": "October 2026", "category": "third-party", "status": "Confirmed", "attacker": "Unknown", "impact": "About 8.72M customers: names, gender, DOB, emails, phone numbers.", "what": "Daiichi Kosho's supplier, Nippon Columbia Group, was hit by a cyberattack that exposed Daiichi Kosho customer data.", "root_cause": "Supplier compromise (vector not disclosed).", "prevention": ["Limit and expire the customer data shared with group companies and suppliers.", "Include suppliers in your security monitoring and incident-response plans."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Trezor (via ShipMonk and via Brevo); BitBox; CoinTracking", "slug": "trezor-shipmonk-brevo", "sector": "Crypto hardware / fintech", "country": "Global", "date": "2026-09-10", "date_note": "ShipMonk Sep 5; Brevo Sep 10", "category": "third-party", "status": "Confirmed", "attacker": "Unknown", "impact": "ShipMonk exposed about 67,000 more US Trezor customers (names, emails, phones, addresses, orders). In a separate incident, 138 Brevo email-marketing accounts were breached, contacts were exported from 43, and phishing emails seeking wallet seed phrases went out through legitimate crypto mailing lists.", "what": "Two separate vendor compromises: a fulfilment partner (ShipMonk) still held old records that should have been deleted, and the email-marketing platform (Brevo) had customer accounts taken over and used to send phishing.", "root_cause": "Vendor data retention failure (ShipMonk), and compromised marketing-platform accounts that could send as trusted brands (Brevo).", "prevention": ["Contracts should require deletion of shipping data after fulfilment, with verified deletion.", "Turn on MFA and IP-restricted API keys for email service provider accounts, and alert on contact exports.", "Tell crypto customers repeatedly that you will never ask for a seed phrase."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Bimbo Bakeries USA", "slug": "bimbo-bakeries", "sector": "Food manufacturing", "country": "US", "date": "2026-09-06", "date_note": "reported Sep 6", "category": "third-party", "status": "Confirmed", "attacker": "Clop", "impact": "Employee data stolen, including names and SSNs. Total not disclosed.", "what": "Clop exploited an Oracle E-Business Suite zero-day through a third-party vendor's environment.", "root_cause": "A zero-day in Oracle EBS, reached through a vendor.", "prevention": ["Don't expose ERP systems (Oracle EBS, PeopleSoft) to the internet; require VPN or zero-trust access.", "Patch Oracle CPU releases promptly, and know which vendors run ERP on your behalf.", "Encrypt or tokenise SSNs at the field level in HR systems."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "BigCommerce merchants (via Ribon apps)", "slug": "bigcommerce-ribon", "sector": "E-commerce", "country": "Global", "date": "2026-09-22", "date_note": "access Sep 13-17; reported Sep 22", "category": "third-party", "status": "Confirmed", "attacker": "Unknown", "impact": "Shopper names, emails, phone numbers, shipping addresses. Malicious scripts were injected into some storefronts. Passwords and payment cards were not affected.", "what": "Attackers used compromised credentials for the third-party Ribon / Ribon 1.5 apps to read shopper data and inject scripts into merchant stores.", "root_cause": "An over-privileged third-party app was compromised, and storefronts had no protection against script injection.", "prevention": ["Review and minimise the permissions of marketplace apps, and remove unused ones.", "Use Content-Security-Policy and Subresource Integrity, and monitor payment-page scripts (PCI DSS 4.0 requirements 6.4.3 and 11.6.1).", "Platforms: rotate app credentials and alert on bulk reads by an app."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "UpdraftPlus / TeamUpdraft (WordPress)", "slug": "updraftplus", "sector": "Software (WordPress plugins)", "country": "Global", "date": "2026-10-18", "date_note": "Oct 17-18 weekend", "category": "third-party", "status": "Confirmed", "attacker": "Unknown", "impact": "Commands sent to connected WordPress sites created unexpected admin users and installed malicious plugins. The risk is mainly to sites connected through UpdraftCentral remote management.", "what": "The attacker got into TeamUpdraft's website with a compromised key, stole UpdraftCentral connection keys, and used them to command customer sites.", "root_cause": "One vendor-side key compromise gave remote control of many customer sites, because the remote-management keys were stored centrally.", "prevention": ["Vendors: store remote-management keys encrypted in an HSM or KMS, separate from the web tier, and require customer-side approval for high-risk commands.", "Site owners: disconnect remote-management services you don't use, and audit admin users and plugins.", "Alert on new admin-user creation in WordPress."], "sources": [{"title": "CyberNexora: Black October 2026, 14 cyber incidents", "url": "https://blog.cybernexora.com/black-october-2026-cybersecurity-incidents/"}]}, {"name": "OVHcloud CLI", "slug": "ovhcloud-cli", "sector": "Cloud / developer tooling", "country": "France / Global", "date": "2026-10-19", "date_note": "94-minute window, 14:47-16:21 UTC+2", "category": "third-party", "status": "Confirmed", "attacker": "Unknown", "impact": "Release binaries for v0.11.0 to v0.15.0 were replaced with malicious files. Anyone who downloaded and ran them during the window should rotate exposed secrets.", "what": "A compromised developer account was used to swap legitimate release files for malicious ones. Source code and the build chain were not affected.", "root_cause": "A single developer account could overwrite published release artifacts.", "prevention": ["Make releases immutable once published; nobody should be able to replace a binary after release.", "Sign artifacts and publish provenance (Sigstore / SLSA). Users should verify signatures or pinned checksums.", "Require hardware-key MFA for maintainers, and two-person approval for release changes."], "sources": [{"title": "CyberNexora: Black October 2026, 14 cyber incidents", "url": "https://blog.cybernexora.com/black-october-2026-cybersecurity-incidents/"}]}, {"name": "Railway", "slug": "railway", "sector": "Developer platform (PaaS)", "country": "US", "date": "2026-10-21", "date_note": "disclosed Oct 21", "category": "third-party", "status": "Confirmed", "attacker": "Unknown", "impact": "An unauthorized party may have accessed encrypted customer environment variables and decrypted some of them (API keys, database credentials, registry credentials). Railway told all users to rotate secrets and paused deployments.", "what": "Railway detected anomalous activity in the systems that store customer environment variables. It suggested this may be one of a series of attacks on platform companies and AI inference providers (unconfirmed).", "root_cause": "Full root cause not yet published. The attacker reached both the stored secrets and the means to decrypt them.", "prevention": ["Platforms: use envelope encryption with KMS or HSM keys that only the running workload's identity can use to decrypt, so stored secrets plus database access is not enough.", "Customers: prefer short-lived credentials (OIDC federation to AWS/GCP, scoped database users) over static keys in environment variables.", "Customers: set spend limits and alerts on LLM and API keys (OpenAI, Anthropic, OpenRouter, Stripe) to catch abuse fast."], "sources": [{"title": "Railway blog: Security disclosure / preliminary report, Oct 21 incident", "url": "https://blog.railway.com/"}, {"title": "CyberNexora: Black October 2026, 14 cyber incidents", "url": "https://blog.cybernexora.com/black-october-2026-cybersecurity-incidents/"}]}, {"name": "Bitget", "slug": "bitget", "sector": "Crypto exchange", "country": "Global", "date": "2026-09-24", "date_note": "first access Aug 31; theft Sep 24", "category": "unpatched", "status": "Confirmed", "attacker": "Not confirmed (one outlet says North Korea)", "impact": "About $387.5M drained from hot and warm wallets. Cold wallets and user balances were covered by the protection fund.", "what": "Attackers used zero-days in two third-party security appliances, planted a web shell, moved laterally to the production wallet job server, obtained high-privilege internal credentials, and issued fraudulent withdrawals. First they sent small test transfers that stayed under the risk-control threshold.", "root_cause": "Security appliances had network reach into the wallet infrastructure. Withdrawal authority sat on a server that could be commanded once compromised, and risk checks only looked at single transactions.", "prevention": ["Isolate security appliances; they should have no route to production wallet systems.", "Require multi-party HSM or MPC signing with policy enforced outside the hot server (velocity limits, allow-lists, human approval above thresholds).", "Risk controls should flag patterns (new destinations, cumulative volume, test-then-drain), not only single transfers.", "Watch appliances for web shells and unexpected outbound C2 traffic."], "sources": [{"title": "The Hacker News: Bitget confirms third-party zero-day", "url": "https://thehackernews.com/2026/10/bitget-confirms-third-party-zero-day.html"}, {"title": "BleepingComputer: Bitget hacked via zero-day in third-party security products", "url": "https://bleepingcomputer.com/news/security/bitget-hacked-via-zero-day-in-third-party-security-products"}, {"title": "The Block: Bitget attacker tested risk controls with small transfers", "url": "https://www.theblock.co/news/regulation/2026-09-28-bitget-attacker-tested-risk-controls-small-transfers-388-million-theft-ceo-says-417045"}]}, {"name": "FBI (FBIJobs.gov / applicant portal)", "slug": "fbi-peoplesoft", "sector": "Government", "country": "US", "date": "2026-09-22", "date_note": "claimed Sep 22", "category": "unpatched", "status": "Claimed (unverified)", "attacker": "ShinyHunters", "impact": "ShinyHunters claims 2-3 TB on current and former employees and applicants. A 5,000-record sample was partly matched by Reuters. The FBI confirmed only that it is investigating activity affecting FBIJobs.gov; the job portals were taken offline.", "what": "ShinyHunters says it exploited Oracle PeopleSoft and then pivoted into FBI-managed AWS GovCloud.", "root_cause": "Linked to CVE-2026-35273 (unauthenticated RCE in PeopleSoft PeopleTools, patched by Oracle in June). Mandiant and Vectra describe a one-character substitution that slipped past the recommended WAF workaround.", "prevention": ["Apply the vendor patch; don't rely on WAF rules as the long-term fix.", "Keep HR and applicant systems off the open internet where possible, and segment them from cloud admin roles.", "Use least-privilege cloud roles, so a compromised app server can't pivot across the cloud account."], "sources": [{"title": "BleepingComputer: ShinyHunters claims FBI hack via PeopleSoft", "url": "https://bleepingcomputer.com/news/security/shinyhunters-claims-fbi-hack-data-theft-in-peoplesoft-zero-day-breach"}, {"title": "Help Net Security: FBI job portals remain offline", "url": "https://www.helpnetsecurity.com/2026/09/28/fbi-job-portals-offline-shinyhunters-breach/"}, {"title": "Vectra: ShinyHunters breached the FBI by bypassing the fix", "url": "https://www.vectra.ai/blog/shinyhunters-breached-the-fbi-by-bypassing-the-fix"}, {"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Japan Digital Agency (Government Solution Service)", "slug": "japan-digital-agency", "sector": "Government", "country": "Japan", "date": "2026-09-14", "date_note": "reported Sep 14", "category": "unpatched", "status": "Confirmed", "attacker": "Unknown", "impact": "About 246,000 personnel records potentially exposed: names, emails, phone numbers, addresses.", "what": "An attacker exploited a vulnerability in a VPN device to reach an internal system.", "root_cause": "An unpatched (or zero-day) VPN appliance.", "prevention": ["Patch VPN appliances within days of a fix, or replace VPN with identity-aware zero-trust access.", "Monitor VPN appliances for compromise indicators, and segment what VPN users can reach."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Gyazo", "slug": "gyazo", "sector": "Consumer software", "country": "Japan / Global", "date": "2026-09-18", "date_note": "reported Sep 18", "category": "unpatched", "status": "Confirmed", "attacker": "Unknown", "impact": "About 23.62M user records plus metadata from about 490M images: password hashes, session IDs, IPs, and EXIF location data.", "what": "Attackers exploited a flaw in the image-upload server to execute commands.", "root_cause": "Command execution in the upload-processing path, with access to the user database from that server.", "prevention": ["Process uploads in a sandboxed, unprivileged worker with no database credentials.", "Strip EXIF and location data at upload time and don't keep it.", "Hash passwords with a modern KDF (Argon2id or bcrypt), and invalidate sessions after a breach."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "CenterPoint Energy", "slug": "centerpoint-energy", "sector": "Utilities", "country": "US", "date": "2026-09-16", "date_note": "reported Sep 16", "category": "unpatched", "status": "Partially confirmed", "attacker": "Actor using a hex-encoded handle", "impact": "About 7.49M records claimed: names, SSNs, phone numbers, addresses, account and billing data for some customers. CenterPoint confirmed unauthorized access. Electricity and gas were unaffected.", "what": "The attacker claimed to have pulled data through an external-facing API.", "root_cause": "An external API exposed bulk customer data, most likely through broken object-level authorization or weak API authentication (exact flaw not disclosed).", "prevention": ["Keep an inventory of every external API, and test for broken object-level authorization (OWASP API #1).", "Rate-limit and alert on bulk enumeration; 7M records should never leave through a customer API.", "Never return SSNs from customer-facing APIs; mask them server-side."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "JetBrains (Cadence environment)", "slug": "jetbrains-cadence", "sector": "Software", "country": "Global", "date": "2026-09-05", "date_note": "reported Sep 5", "category": "unpatched", "status": "Confirmed", "attacker": "Unknown", "impact": "Possible exposure of AWS credentials, secrets and backups. Users were told to rotate credentials.", "what": "Attackers exploited an unpatched critical TeamCity vulnerability to reach the Cadence environment.", "root_cause": "An unpatched CI/CD server. TeamCity auth-bypass bugs (for example CVE-2026-63077) are also being used by ransomware gangs.", "prevention": ["Treat CI/CD as crown jewels: patch fast, never expose it publicly, and require SSO and MFA.", "Keep cloud credentials out of CI; use OIDC federation for short-lived tokens."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Frontline Education", "slug": "frontline-education", "sector": "EdTech", "country": "US", "date": "2026-10-01", "date_note": "October 2026", "category": "unpatched", "status": "Confirmed", "attacker": "Unknown", "impact": "SSNs, emails and addresses of employees at affected school districts. Scope under investigation.", "what": "Hackers exploited a vulnerability in third-party software used by Frontline.", "root_cause": "An unpatched third-party component.", "prevention": ["Keep a software bill of materials, and track vulnerabilities in third-party components.", "Encrypt SSNs at the field level and restrict who can read them."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Revolut", "slug": "revolut", "sector": "Fintech", "country": "UK / EU", "date": "2026-09-12", "date_note": "reported Sep 12", "category": "social-engineering", "status": "Confirmed", "attacker": "Unknown", "impact": "Customer DOBs, contact details, passport and licence copies, possible selfies, statements and transaction histories. Systems and funds unaffected.", "what": "Fraudulent data requests sent from a legitimate government-agency email domain led Revolut to hand over customer data.", "root_cause": "A fake official data request (emergency or law-enforcement style) from a compromised or spoofed real government mailbox was trusted because of the sender domain.", "prevention": ["Verify every legal or law-enforcement data request out of band, by calling a known number for the agency, and use LE portals where they exist.", "Apply a two-person rule and minimum-necessary disclosure for legal requests.", "Don't treat the sender domain as proof; government mailboxes get compromised."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Vietnam APIS airline passenger database", "slug": "vietnam-apis-database", "sector": "Aviation / Government", "country": "Vietnam", "date": "2026-09-08", "date_note": "reported Sep 8", "category": "exposure", "status": "Reported (secondary sources)", "attacker": "None identified (exposure)", "impact": "About 220M records: names, passport numbers, nationality, DOB, flight and seat details.", "what": "A misconfigured cloud database holding advance passenger information was publicly reachable until researchers alerted authorities.", "root_cause": "Cloud database exposed to the internet without authentication.", "prevention": ["Default-deny network rules on databases, with continuous public-exposure scanning (CSPM).", "Encrypt passport fields, and keep an access log so exposure can be scoped."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Bee Cheng Hiang", "slug": "bee-cheng-hiang", "sector": "Retail (food)", "country": "Singapore", "date": "2026-09-30", "date_note": "reported Sep 30", "category": "exposure", "status": "Confirmed", "attacker": "None (internal error)", "impact": "95,364 customer email addresses exposed to other recipients. No misuse found.", "what": "A bug in AI-assisted code caused bulk marketing emails to reveal recipient addresses.", "root_cause": "AI-generated code shipped without adequate review or testing of a privacy-sensitive path.", "prevention": ["Review and test AI-written code like any other, especially anything that touches customer data.", "Send bulk email through an ESP that sends one message per recipient, never multi-recipient To or CC.", "Do a canary send to an internal list before any bulk send."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Intermarché and Coopérative U (refrigeration systems)", "slug": "intermarche-cooperative-u", "sector": "Grocery retail", "country": "France", "date": "2026-10-12", "date_note": "night of Oct 11-12", "category": "ot", "status": "Confirmed", "attacker": "Unknown (Paris prosecutor / OFAC investigating)", "impact": "150-200 Intermarché stores and fewer than 100 Coopérative U stores had to throw away all fresh and frozen products. No data theft reported. Insurers may not cover the losses.", "what": "Attackers remotely forced refrigeration units into defrost across hundreds of stores overnight. One report says Danfoss refrigeration controls were targeted (unconfirmed).", "root_cause": "Refrigeration controllers or their remote-management platform were reachable and controllable from outside. Exact path not disclosed.", "prevention": ["Never expose refrigeration or building-management controllers to the internet; use a brokered, MFA-protected vendor access path.", "Change default credentials and patch controller firmware.", "Set hard local temperature limits and alarms that a remote 'defrost' command can't override for hours.", "Run overnight alerting to on-call staff for mass setpoint or mode changes."], "sources": [{"title": "Sud Radio (AFP): Supermarkets hit by cyberattack on refrigeration systems", "url": "https://www.sudradio.fr/societe/des-supermarches-victimes-dune-cyberattaque-visant-leurs-installations-frigorifiques-confirment-cooperative-u-et-intermarche"}, {"title": "Paris Match: Supermarkets forced to throw away fresh and frozen goods", "url": "https://www.parismatch.be/actualites/monde/2026/10/12/inedit-et-dune-extreme-gravite-de-nombreux-supermarches-contraints-de-jeter-une-grande-quantite-de-produits-frais-et-surgeles-en-france-2K5XHP7LYFB6PCUIU56YP65GQA/"}, {"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Quest Diagnostics (Quanum Lab Services Manager)", "slug": "quest-diagnostics", "sector": "Healthcare", "country": "US", "date": "2026-10-21", "date_note": "discovered Oct 21; 8-K filed Oct 22", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Patient personal information and records (PHI) taken. Count not disclosed. Quanum is used by about 500,000 clinicians across North America.", "what": "Unauthorized access to Quanum, Quest's lab ordering and billing system, which involved 'certain patient records'.", "root_cause": "Not disclosed.", "prevention": ["Phishing-resistant MFA for every clinician and admin login to Quanum-type portals.", "Bulk-export detection on PHI systems.", "Quest's 2019 breach (11.9M records) came through a billing vendor; review third-party access to Quanum too."], "sources": [{"title": "TechCrunch: Quest Diagnostics confirms patient data compromised (2026-10-23)", "url": "https://techcrunch.com/2026/10/23/lab-testing-giant-quest-diagnostics-confirms-patients-personal-and-health-data-was-compromised-during-breach/"}, {"title": "Tech Insider: Quest Diagnostics Quanum LSM breach", "url": "https://tech-insider.org/quest-diagnostics-quanum-lsm-breach-2026/"}]}, {"name": "Capcom (CAPCOM ID)", "slug": "capcom-id", "sector": "Video games", "country": "Japan / Global", "date": "2026-10-19", "date_note": "detected Oct 19; disclosed Oct 22", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "11,774,247 CAPCOM ID records (emails, plus per some reports usernames, last-login time, login count and IP). Fuller data on 43 accounts. Attackers changed passwords on 196 accounts, which were then reset. No card data.", "what": "A third party accessed CAPCOM ID customer data. Games were unaffected.", "root_cause": "Not disclosed. The attackers were able to change account passwords, which suggests access to account-management functions, not just a read-only data copy.", "prevention": ["Notify users and require re-verification on every password or email change.", "Offer MFA and passkeys on game accounts.", "Restrict and log admin or API paths that can change credentials.", "Users: expect Capcom-themed phishing emails."], "sources": [{"title": "Capcom: Notice regarding customer information affected through unauthorized access", "url": "https://www.capcom.co.jp/ir/english/news/html/e261022.html"}, {"title": "Help Net Security: Capcom data breach exposes 11.7M account records", "url": "https://www.helpnetsecurity.com/2026/10/23/capcom-id-data-breach-11-million-records-exposed/"}, {"title": "SecurityWeek: 11 million impacted by Capcom data breach", "url": "https://www.securityweek.com/11-million-impacted-by-capcom-data-breach/"}]}, {"name": "Ahold Delhaize (Food Lion, Giant Food, The GIANT Company, Stop & Shop, Hannaford, and others)", "slug": "ahold-delhaize", "sector": "Grocery retail", "country": "US / EU", "date": "2026-10-12", "date_note": "disclosed Oct 12; update Oct 19", "category": "undisclosed", "status": "Confirmed", "attacker": "Not identified", "impact": "Websites and apps went offline across most brands in Europe and the US, disrupting pickup and delivery. Stores stayed open. No data theft confirmed as of the Oct 19 update.", "what": "Suspicious activity led to precautionary shutdowns; the company later confirmed 'malicious actions of others'. This is its second major incident in two years (the 2024 INC Ransom attack affected 2.2M people).", "root_cause": "Not disclosed. The Register asked, without confirming, whether it is linked to the French refrigeration attacks the same weekend.", "prevention": ["After a prior ransomware incident, run a full compromise assessment and rotate every credential; repeat incidents often reuse old footholds.", "Segment e-commerce from corporate IT, so a precautionary shutdown of one doesn't take down the other.", "Keep tested failover for online ordering."], "sources": [{"title": "BleepingComputer: Retail giant Ahold Delhaize takes systems offline after cyberattack", "url": "https://bleepingcomputer.com/news/security/retail-giant-ahold-delhaize-takes-systems-offline-after-cyberattack"}, {"title": "The Register: Ahold Delhaize incident", "url": "https://www.theregister.com/a/5303970"}, {"title": "CyberNexora: Black October 2026, 14 cyber incidents", "url": "https://blog.cybernexora.com/black-october-2026-cybersecurity-incidents/"}]}, {"name": "Keio Corporation", "slug": "keio", "sector": "Transport / hospitality", "country": "Japan", "date": "2026-09-26", "date_note": "attack Sep 26; confirmed Sep 28", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Hospitality and payment business systems disrupted; network shut down for containment. Railway operations unaffected. About 59,000 email addresses reportedly exposed.", "what": "Ransomware hit Keio's business systems.", "root_cause": "Not disclosed.", "prevention": ["Keep OT (rail) and IT segmented, which appears to have worked here.", "Use immutable backups for payment and hospitality systems."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}, {"title": "Tech.co: Data breaches that have happened this year (2026)", "url": "https://tech.co/news/data-breaches-updated-list"}]}, {"name": "State Bank of India (SBI)", "slug": "sbi", "sector": "Banking", "country": "India", "date": "2026-10-16", "date_note": "alerts Oct 16; reported Oct 21", "category": "undisclosed", "status": "Partially confirmed", "attacker": "'Siriusim' (claimed)", "impact": "A 375,000-record dark-web dataset was reviewed; SBI identified 3,897 customer records with PII (name, mobile, DOB, email, address, customer ID, loan details). Core operations unaffected.", "what": "SBI investigated suspected customer-data exposure after alerts from threat intelligence, the Defence Cyber Agency and CERT-In.", "root_cause": "Not disclosed; may involve a subsidiary or vendor.", "prevention": ["Monitor the dark web for your own data, which is how this was caught.", "Apply data-loss prevention to loan-processing and partner channels."], "sources": [{"title": "CyberNexora: Black October 2026, 14 cyber incidents", "url": "https://blog.cybernexora.com/black-october-2026-cybersecurity-incidents/"}, {"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Ampath Laboratories", "slug": "ampath-laboratories", "sector": "Healthcare (pathology)", "country": "South Africa", "date": "2026-10-15", "date_note": "October 2026", "category": "undisclosed", "status": "Claimed (unverified)", "attacker": "BytetoBreach", "impact": "80M patient records claimed (names, ID numbers, DOB, sex, addresses, emails, phones). Unverified.", "what": "Ransomware attack and data-theft claim.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category.", "Apply data retention limits to historical lab-patient records."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Skyticket (Adventure Inc.)", "slug": "skyticket-adventure", "sector": "Travel", "country": "Japan", "date": "2026-10-01", "date_note": "October 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "14.64M records: names, DOB, emails, phones, postal addresses, hashed passwords.", "what": "A cyberattack exposed customer information.", "root_cause": "Not disclosed.", "prevention": ["Use a modern password hashing algorithm, and force resets.", "Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Yakiniku King (Monogatari Corp.)", "slug": "yakiniku-king-monogatari", "sector": "Restaurants", "country": "Japan", "date": "2026-10-05", "date_note": "disclosed Oct 5", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Data of 10,788,963 app members.", "what": "Breach of member data for the official app.", "root_cause": "Not disclosed.", "prevention": ["Collect less app-member data, and expire inactive accounts.", "Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Mr.Max Holdings", "slug": "mr-max", "sector": "Retail", "country": "Japan", "date": "2026-10-06", "date_note": "reported Oct 6", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "1,735,154 members: IDs, names, emails, phones.", "what": "Unauthorized access to company servers.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "GMO Research & AI", "slug": "gmo-research", "sector": "Market research", "country": "Japan", "date": "2026-10-01", "date_note": "October 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Up to 948,500 members: names, emails, addresses.", "what": "A cyberattack exposed panel member data.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "GMO Internet (Onamae.com Desktop Cloud)", "slug": "gmo-onamae-desktop-cloud", "sector": "Hosting", "country": "Japan", "date": "2026-10-10", "date_note": "October 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "26,739 customer servers potentially affected; malicious programs installed in some. Trading-tool credentials saved on them may be exposed. Service suspended.", "what": "Unauthorized access led to malware being installed in customer desktop-cloud environments.", "root_cause": "Not disclosed. Pushing to many tenants at once suggests the shared management layer.", "prevention": ["Isolate the provider management plane, and alert on mass software deployment.", "Customers: don't save brokerage credentials in tools on shared desktop clouds; use MFA on trading accounts."], "sources": [{"title": "CyberNexora: Black October 2026, 14 cyber incidents", "url": "https://blog.cybernexora.com/black-october-2026-cybersecurity-incidents/"}]}, {"name": "Zeabur", "slug": "zeabur", "sector": "Cloud deployment platform", "country": "Taiwan / Global", "date": "2026-10-14", "date_note": "disclosed Oct 14; shutdown announced Oct 17", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Unauthorized access to internal systems and some customer services, the second incident after one in August. The company is winding down: services stop from Dec 1, and all servers by Dec 31, 2026.", "what": "A repeat intrusion with broader scope than the August incident, followed by a decision to shut the company down.", "root_cause": "Not disclosed. The repeat incident suggests incomplete eradication after August.", "prevention": ["After an incident, do full eradication: rebuild from known-good images and rotate every secret, not just the obvious ones.", "Customers: keep portable deployments and exports, so a platform shutdown isn't fatal."], "sources": [{"title": "CyberNexora: Black October 2026, 14 cyber incidents", "url": "https://blog.cybernexora.com/black-october-2026-cybersecurity-incidents/"}]}, {"name": "Aesto Health", "slug": "aesto-health", "sector": "Healthcare IT", "country": "US", "date": "2026-09-01", "date_note": "access Dec 2-18 2025; disclosed Sep 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "9,540,683 individuals: names, DOB, medical, insurance, government ID, financial account data, SSNs.", "what": "Unauthorized access to part of Aesto's AWS infrastructure.", "root_cause": "Not disclosed (AWS environment access).", "prevention": ["Use AWS GuardDuty and CloudTrail alerting, least-privilege IAM, and no long-lived access keys.", "Notify faster; nine months from access to disclosure is too long."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "AdaptHealth", "slug": "adapthealth", "sector": "Healthcare", "country": "US", "date": "2026-09-10", "date_note": "reported Sep 10", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "4.1M+ people: personal, health and insurance data.", "what": "An attacker accessed systems.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "US Department of Defense (Defense Manpower Data Center)", "slug": "dod-dmdc", "sector": "Government", "country": "US", "date": "2026-09-30", "date_note": "reported Sep 30", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "2.76M living and 294,000 deceased individuals: SSNs and job details. No misuse found.", "what": "Breach of personnel data.", "root_cause": "Not disclosed.", "prevention": ["Purge or archive offline the records of deceased and long-separated personnel.", "Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Times Car Rental", "slug": "times-car-rental", "sector": "Car rental", "country": "Japan", "date": "2026-09-30", "date_note": "reported Sep 30", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "About 6.6M accounts; about 1.6M documents accessed, including ID-verification images.", "what": "Breach of accounts and stored documents.", "root_cause": "Not disclosed.", "prevention": ["Don't keep ID-verification images after verification; store only the result.", "Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Denmark Central Population Registry (CPR) and Technical University of Denmark (DTU)", "slug": "denmark-cpr-dtu", "sector": "Government / Education", "country": "Denmark", "date": "2026-10-10", "date_note": "October 2026", "category": "undisclosed", "status": "Reported (secondary sources)", "attacker": "Unknown", "impact": "CPR: 8.8M people (names, addresses, CPR numbers). DTU: about 200,000 people from identity and access management systems.", "what": "Reported breaches of the national civil registry and of DTU's identity and access management systems, with large-scale exfiltration at DTU.", "root_cause": "Not disclosed.", "prevention": ["Treat the IAM system itself as tier 0, with privileged-access workstations and MFA for admins.", "Monitor bulk directory exports."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}, {"title": "Tech.co: Data breaches that have happened this year (2026)", "url": "https://tech.co/news/data-breaches-updated-list"}]}, {"name": "Nueva EPS", "slug": "nueva-eps", "sector": "Health insurance", "country": "Colombia", "date": "2026-10-04", "date_note": "Oct 4", "category": "undisclosed", "status": "Claimed (unverified)", "attacker": "Unknown seller", "impact": "Database of 11M+ people listed for sale: IDs, DOB, addresses, medical, disability and mental-health data.", "what": "Database offered on a hacking forum.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Condé Nast", "slug": "conde-nast", "sector": "Media", "country": "US", "date": "2026-09-07", "date_note": "Sep 7", "category": "undisclosed", "status": "Claimed (unverified)", "attacker": "Unknown seller", "impact": "About 32.8M accounts offered for $15,000; a sample matched genuine 2025 data. Emails, names, addresses, DOB, phones; no passwords.", "what": "A user database was offered on a Russian-language forum. Not confirmed by the company.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "IDScan", "slug": "idscan", "sector": "Identity verification", "country": "US", "date": "2026-09-10", "date_note": "Sep 10", "category": "undisclosed", "status": "Reported (secondary sources)", "attacker": "Unknown", "impact": "150M+ driver's licence records and photos reportedly on the dark web.", "what": "Hackers stole ID records from cloud systems.", "root_cause": "Not disclosed.", "prevention": ["ID-verification vendors should keep scan images only briefly, with encryption and strict deletion.", "Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Weverse (HYBE)", "slug": "weverse", "sector": "Entertainment", "country": "South Korea", "date": "2026-09-10", "date_note": "Sep 10", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "422,584 accounts: internal IDs and purchase, payment-method and refund details.", "what": "Account and transaction information compromised.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Novocure", "slug": "novocure", "sector": "Medical devices", "country": "US", "date": "2026-09-01", "date_note": "access mid-Aug; reported Sep 1", "category": "undisclosed", "status": "Confirmed", "attacker": "ShinyHunters", "impact": "Internal patient IDs from 1,400+ US records; identifying data for under 50 others; provider and employee contacts.", "what": "Unauthorized access to some information systems.", "root_cause": "Not disclosed. ShinyHunters' 2026 playbook is mostly vishing for SSO or SaaS credentials and exploiting PeopleSoft.", "prevention": ["Use the controls listed under the social-engineering category (help-desk verification, phishing-resistant MFA).", "Review OAuth app grants in SaaS tenants."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}, {"title": "State of Surveillance: ShinyHunters 2026 breach tracker", "url": "https://stateofsurveillance.org/news/shinyhunters-2026-breach-tracker-salesforce-carnival-canvas-campaign/"}]}, {"name": "Astrana Health", "slug": "astrana", "sector": "Healthcare", "country": "US", "date": "2026-09-24", "date_note": "SEC filing Sep 24", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Potential exposure of confidential data; some systems restored from clean backups.", "what": "Unauthorized access to servers.", "root_cause": "Not disclosed.", "prevention": ["Clean, tested backups worked here; make them standard practice."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Ludwig Maximilian University of Munich (LMU)", "slug": "lmu-munich", "sector": "Education", "country": "Germany", "date": "2026-09-21", "date_note": "Sep 21", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Student enrolment data: names, DOB, contacts, bank and health-insurance numbers, education records.", "what": "Attacker accessed the system holding enrolment data.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Mathspace", "slug": "mathspace", "sector": "EdTech", "country": "Australia", "date": "2026-09-07", "date_note": "Sep 7", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Over 1M students, staff and parents.", "what": "Systems breached and personal data stolen.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "University of Illinois Chicago (College of Medicine)", "slug": "uic-college-of-medicine", "sector": "Education / Healthcare", "country": "US", "date": "2026-10-08", "date_note": "October 2026", "category": "undisclosed", "status": "Partially confirmed", "attacker": "Booba Project (claimed)", "impact": "344 GB of personal, research and academic data claimed; College of Medicine systems offline.", "what": "Cyberattack that forced systems offline.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "ASOS", "slug": "asos", "sector": "Retail (fashion)", "country": "UK", "date": "2026-10-08", "date_note": "October 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Names and contact details; volume under investigation.", "what": "Unauthorized access to a database.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Georgia Power", "slug": "georgia-power", "sector": "Utilities", "country": "US", "date": "2026-10-08", "date_note": "October 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Some customer accounts accessed: names, addresses, phones, emails, last four SSN digits.", "what": "An unauthorized third party accessed some customer accounts.", "root_cause": "Not disclosed. Account-level access is typical of credential stuffing.", "prevention": ["Run credential-stuffing defences on customer portals (breached-password checks, bot detection, MFA).", "Don't display even partial SSNs in customer portals."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "MetaMask (Consensys)", "slug": "metamask", "sector": "Crypto wallet", "country": "Global", "date": "2026-10-01", "date_note": "disclosed Oct 1", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Some infrastructure affected; under investigation.", "what": "Cyberattack on infrastructure.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "UK fashion retail: The Foschini Group (Hobbs, Whistles) and Phase Eight", "slug": "uk-fashion-retail", "sector": "Retail (fashion)", "country": "UK", "date": "2026-10-08", "date_note": "October 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Some IT systems affected or taken offline; under investigation.", "what": "Separate cyberattacks on fashion retailers.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Senture (US Department of Transportation contractor)", "slug": "senture-dot", "sector": "BPO / Government contractor", "country": "US", "date": "2026-10-08", "date_note": "October 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "The DOT took connected systems offline; under investigation.", "what": "Attack on the contractor.", "root_cause": "Not disclosed.", "prevention": ["Use the third-party category controls on the government side: scoped, quickly revocable contractor connectivity."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Aryza", "slug": "aryza", "sector": "Fintech software", "country": "Ireland / UK", "date": "2026-10-23", "date_note": "leak-site listing Oct 23", "category": "undisclosed", "status": "Claimed (unverified)", "attacker": "Qilin", "impact": "Listed on Qilin's leak site.", "what": "Ransomware claim.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "HookPhish: Aryza data breach, Qilin ransomware claim", "url": "https://www.hookphish.com/blog/ransomware-group-qilin-hits-aryza/"}, {"title": "Breachsense: Data breaches in October 2026", "url": "https://www.breachsense.com/breaches/2026/october/"}]}, {"name": "Icon Oncology", "slug": "icon-oncology", "sector": "Healthcare", "country": "Australia", "date": "2026-10-08", "date_note": "October 2026", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "31,000+ documents with patient data.", "what": "Cyberattack exposed patient data.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}]}, {"name": "Stadtwerke Landsberg", "slug": "stadtwerke-landsberg", "sector": "Utilities", "country": "Germany", "date": "2026-09-08", "date_note": "Sep 8", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Central IT network encrypted; office and communications disrupted; possible theft of customer and banking data. Essential services continued.", "what": "Encryption (ransomware) attack.", "root_cause": "Not disclosed.", "prevention": ["Segment utility OT from IT, which appears to have held here.", "Use immutable backups."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Berlin state government (two departments)", "slug": "berlin-state-government", "sector": "Government", "country": "Germany", "date": "2026-09-05", "date_note": "Sep 5", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown ransomware group", "impact": "Stolen data published; extent under assessment.", "what": "Ransomware with data leak.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "US municipalities: Heber City UT, Vicksburg MS, Radford VA, Everett MA; Springfield (MA) Public Schools", "slug": "us-municipalities", "sector": "Local government / Education", "country": "US", "date": "2026-10-10", "date_note": "Sep 8 to Oct 10", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Systems offline, including utility payments, email and phones; Springfield schools temporarily closed.", "what": "Separate cyber incidents disrupting local services.", "root_cause": "Not disclosed.", "prevention": ["Use the free CISA and MS-ISAC services for local governments (vulnerability scanning, MDBR, incident response).", "Phishing-resistant MFA on email, plus offline backups."], "sources": [{"title": "SharkStriker: Top data breaches of October 2026", "url": "https://sharkstriker.com/blog/october-2026-data-breaches/"}, {"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}, {"name": "Dyfed-Powys Police", "slug": "dyfed-powys-police", "sector": "Law enforcement", "country": "UK (Wales)", "date": "2026-09-25", "date_note": "Sep 25", "category": "undisclosed", "status": "Confirmed", "attacker": "Unknown", "impact": "Some non-emergency systems disrupted; staff information may have been accessed.", "what": "Cyberattack on police systems.", "root_cause": "Not disclosed.", "prevention": ["Use the baseline controls for this category."], "sources": [{"title": "Cyber Management Alliance: Major cyber attacks, September 2026", "url": "https://www.cm-alliance.com/cybersecurity-blog/major-cyber-attacks-data-breaches-ransomware-attacks-september-2026"}]}], "campaigns": [{"name": "AI-agent hacking spree (Cairn / DeepSeek / Claude Code)", "period": "From Sep 25, 2026; Reuters report Oct 19", "victims": "100+ companies in the US, Canada, Australia and Japan, including Deere, SharkNinja and Cummins. 1,200+ e-commerce sites targeted.", "how": "A single Chinese-speaking operator gave AI agents short natural-language instructions; the agents handled scanning, probing and exploitation, taking about 23 hours per breach and about $5,000 of tokens in total. A researcher found about two dozen internet-exposed instances of Cairn, an open-source AI agent platform, linked to the campaign. The exact weakness exploited on victim sites has not been confirmed.", "prevent": ["Assume attackers can probe every exposed endpoint continuously and cheaply. Patch faster and shrink your attack surface.", "Never expose self-hosted AI agent platforms without authentication.", "Add rate limits and logging that make sustained automated probing visible."]}, {"name": "Storm-0940 'ARTEX' AI-accelerated Microsoft 365 attacks", "period": "Reported by Microsoft Oct 21, 2026", "victims": "2,250+ Microsoft 365 tenants targeted. Password spraying against 327 accounts at eight organisations described in detail. Being targeted does not mean being compromised.", "how": "A China-aligned actor used an agentic AI pentest framework for fast recon, password spraying, and abuse of applications with existing cloud access.", "prevent": ["Block legacy authentication, require phishing-resistant MFA, and use Entra ID smart lockout and password protection.", "Audit enterprise apps and service principals with broad Graph permissions."]}, {"name": "ShinyHunters 2026 campaign (vishing, SSO/OAuth abuse, PeopleSoft)", "period": "All of 2026; Sep-Oct: FBI, Florida DAVID, Novocure, Clop leak-site hijack", "victims": "Dozens of companies, including Instructure/Canvas (30M+), Klue (about 200 downstream companies), and the FBI (claimed).", "how": "Voice phishing of help desks and employees for Okta and SSO credentials, malicious OAuth apps in SaaS tenants, and Oracle PeopleSoft exploitation (CVE-2026-35273, including WAF-rule bypass).", "prevent": ["Harden help-desk identity verification.", "Use phishing-resistant MFA.", "Restrict which OAuth apps users can authorise.", "Patch PeopleSoft and EBS."]}, {"name": "Microsoft 365 help-desk vishing (PREY-0058)", "period": "Reported Sep 7, 2026", "victims": "Organisations in construction, healthcare, finance, real estate and professional services.", "how": "Callers posed as the IT help desk, got executives to hand over credentials and approve MFA prompts, then stole session tokens to reach SharePoint, OneDrive, Exchange and Box, and exfiltrated data for extortion.", "prevent": ["Use FIDO2 or passkeys (nothing to approve or read out), token protection or binding, and a policy that IT never calls you for MFA."]}, {"name": "Clop: PTC Windchill / FlexPLM and Oracle EBS exploitation", "period": "Ongoing through Sep-Oct 2026", "victims": "40+ organisations named (including Philips, GE and Shell, claimed), Bimbo Bakeries, and Matrix Document Imaging (leak-site listing Oct 22).", "how": "Mass exploitation of internet-exposed product-lifecycle and ERP systems for data theft and extortion.", "prevent": ["Take PLM and ERP systems off the public internet, and patch them immediately when Clop-targeted CVEs drop."]}, {"name": "Japan breach wave", "period": "Sep 25 to Oct 2026", "victims": "At least 36 Japanese organisations issued first breach notices between Sep 25 and Oct 8 alone (IDCF, JR East, Nikkei, Daiichi Kosho, Skyticket, Yakiniku King, Mr.Max, Citizen, Daiwa, Times Car, Keio, GMO, Capcom and others).", "how": "A mix of separate incidents. On Oct 19, a Japanese security firm tied part of the wave to a Chinese-developed AI penetration-testing tool.", "prevent": ["See the individual entries. The common threads are third-party and cloud concentration risk and stale credentials."]}, {"name": "Firewall / VPN credential theft (70,000+ credentials)", "period": "Reported Oct 2026; compromises mostly Feb-Jun 2026", "victims": "Enterprises using exposed network devices.", "how": "Group-IB and NyxLab found 70,000+ credentials tied to compromised network devices and LDAP dumps.", "prevent": ["Patch edge devices, rotate credentials stored on or passing through them, and don't bind VPNs to LDAP with over-privileged service accounts."]}], "why": [{"t": "Logins, not exploits", "d": "Stolen, reused or never-rotated credentials (ETS, Nikkei, Florida DAVID, Veradigm), and help-desk vishing (ShinyHunters, PREY-0058).", "f": "Phishing-resistant MFA everywhere, with no exceptions."}, {"t": "Through someone else", "d": "IDCF Cloud took down 495 organisations at once. Scala exposed Citizen's customers. ShipMonk, Brevo, UpdraftPlus, the OVHcloud CLI and Railway's secret store were all used as ways in.", "f": "Share as little data as possible, use scoped and revocable integration keys, and keep your own backups."}, {"t": "Edge boxes and enterprise apps", "d": "Zero-days in VPNs, security appliances, PeopleSoft, EBS and TeamCity. Bitget lost $387.5M after two security appliances were compromised.", "f": "Patch known-exploited bugs in days, keep management interfaces off the internet, and segment."}, {"t": "AI is speeding attackers up", "d": "One operator with AI agents breached 100+ companies for about $5k. Storm-0940 used an agentic pentest tool against 2,250+ Microsoft 365 tenants.", "f": "Assume constant, cheap probing, and shrink your attack surface."}, {"t": "Physical consequences", "d": "Refrigeration controllers at hundreds of French supermarkets were forced into defrost overnight.", "f": "Keep OT off the open internet, and enforce safety limits locally."}], "categories": {"credentials": {"title": "Stolen or reused credentials", "prevent": ["Phishing-resistant MFA (FIDO2/passkeys) on every externally reachable login, including SFTP, VPN, admin panels, CI/CD and cloud consoles. No password-only exceptions for 'legacy' systems.", "Rotate every credential after any prior incident, and monitor infostealer/breach feeds for your domains and vendors.", "Replace long-lived static secrets with short-lived tokens (OIDC workload identity, SSO-issued sessions).", "Alert on impossible travel, new devices, and unusual data volume per account. Most of these intrusions ran for weeks.", "Least privilege and data minimisation: an account that can read everything turns one stolen login into a mass breach."]}, "third-party": {"title": "Third-party vendor and supply-chain compromise", "prevent": ["Inventory which vendors hold your data and what they can reach. Tier them, and require MFA, logging, breach-notification SLAs and deletion on contract end.", "Give integrations scoped, revocable, IP-restricted credentials, never shared admin keys. Rotate them on any vendor incident.", "Minimise and expire the data you send to vendors (inquiry systems, mailing lists, fulfilment partners).", "Verify software you install: signed releases, provenance attestations (Sigstore/SLSA), pinned hashes, and staged rollout of updates.", "Plan for a provider outage: keep independent backups and a tested restore path outside the provider."]}, "unpatched": {"title": "Unpatched or zero-day flaw in internet-facing software", "prevent": ["Keep an external attack-surface inventory and patch known-exploited bugs (CISA KEV) within days, not quarters.", "Treat vendor 'temporary mitigations' (WAF rules, config workarounds) as stopgaps. Several 2026 breaches came from bypassing them.", "Keep management interfaces of VPNs, firewalls and appliances off the internet. Put them on an isolated management network.", "Assume an edge device will be popped: segment it from crown-jewel systems and monitor it for new web shells and outbound connections.", "Sandbox risky processing (file uploads, image parsing) and run it with minimal privileges."]}, "social-engineering": {"title": "Social engineering (vishing, help-desk impersonation, fraudulent requests)", "prevent": ["Help-desk identity verification that can't be beaten on a phone call (video and ID check, manager callback, no MFA resets on inbound calls).", "Phishing-resistant MFA, so there is no push to approve and no code to read out.", "Bind sessions to devices and alert on token reuse from new IPs.", "Verify official or legal data requests out of band, using contact details you already hold, never those in the request.", "Run regular vishing drills for executives, finance and IT support."]}, "exposure": {"title": "Exposed services, misconfiguration and internal error", "prevent": ["Default-deny network exposure. Scan your own IP space and cloud accounts continuously for open databases, storage buckets and admin and AI-agent panels.", "Require authentication on every internal tool, including self-hosted AI agent platforms, even if it is 'just a test'.", "Run cloud posture management (CSPM) with alerts on public resources.", "Code-review and test any automated customer messaging. AI-generated code needs the same review as human-written code.", "Log and rate-limit, so sustained automated probing is visible."]}, "ot": {"title": "Operational technology and physical systems", "prevent": ["Never expose OT controllers or vendor remote-management portals directly to the internet.", "Route vendor remote access through a brokered, MFA-protected, logged path that is only enabled when needed.", "Change default credentials and patch controller firmware.", "Enforce safe limits locally (hard setpoint bounds, interlocks), so a remote command can't push equipment out of a safe range.", "Alert on setpoint or mode changes outside maintenance windows, and practise manual fallback."]}, "undisclosed": {"title": "Vector not yet disclosed (ransomware, intrusion, data theft)", "prevent": ["The basics that break most ransomware chains: phishing-resistant MFA everywhere, patching edge devices fast, EDR on every endpoint and server, and no flat networks.", "Immutable, offline or logically separated backups, with restores tested against a realistic scenario.", "Data-exfiltration detection: alert on large outbound transfers and unusual cloud-storage uploads.", "Data minimisation and retention limits, because data you deleted can't be stolen.", "Keep an incident-response plan and retainer on hand, and practise the 'take the website and apps offline' decision before you need it."]}}, "top10": [["Phishing-resistant MFA (passkeys / FIDO2) on everything reachable from the internet.", "This includes SFTP, VPN, CI/CD, admin panels, SaaS and vendor portals. It defeats stolen passwords, MFA-fatigue and help-desk vishing, and would have stopped or blunted ETS, Nikkei, Florida DAVID, PREY-0058 and much of ShinyHunters."], ["Patch known-exploited vulnerabilities in days.", "Start with edge devices (VPNs, firewalls, security appliances) and enterprise apps (PeopleSoft, EBS, TeamCity, Windchill). Don't rely on WAF workarounds."], ["Keep management interfaces and OT off the internet.", "This covers appliance admin UIs, refrigeration and building controllers, databases, and self-hosted AI agent platforms."], ["Segment.", "A compromised appliance or web server must not be able to reach wallets, HR data, or the hypervisor (Bitget, IDCF)."], ["Replace static secrets with short-lived ones.", "Use OIDC workload identity and scoped, IP-restricted vendor keys, and rotate everything after any incident (Railway, Veradigm, Nikkei, Zeabur)."], ["Inventory third parties and minimise what they hold.", "Contracts should require MFA, logs, fast notification and deletion (Scala, ShipMonk, Daiwa, IDCF)."], ["Immutable backups outside your primary provider, with tested restores.", "The goal is to survive both ransomware and losing your cloud host."], ["Exfiltration detection.", "Alert on bulk downloads, API enumeration and unusual outbound transfers; several of these breaches ran for months."], ["Help-desk and legal-request verification.", "These processes must not be beatable by a convincing phone call or a real-looking government email (Revolut)."], ["Software supply-chain integrity.", "Use immutable, signed releases, verify what you install, and require hardware-key MFA for maintainers (OVHcloud CLI, UpdraftPlus)."]], "claims": [["2026-10-23", "Airtificial", "Qilin"], ["2026-10-23", "Annapath, Inc.", "Akira"], ["2026-10-23", "Dr. Schnell", "Rhysida"], ["2026-10-23", "Urologic Specialists of Oklahoma", "Everest"], ["2026-10-23", "AMSAM", "BravoX"], ["2026-10-22", "NBC Universal", "SCARLETTGROUP"], ["2026-10-22", "Whirlpool", "WhiteArmor"], ["2026-10-22", "Coastal Alabama Community College", "Interlock"], ["2026-10-22", "Matrix Document Imaging", "CL0P"], ["2026-10-22", "Smart & Biggar", "INC_RANSOM"], ["2026-10-22", "Adobe Insurance Brokers", "PEAR"], ["2026-10-21", "Haier Group", "Everest"], ["2026-10-21", "AVEVA Group", "Mimori"], ["2026-10-21", "St. James's Place plc", "Mimori"], ["2026-10-21", "Bruin", "EMPERADOR"], ["2026-10-21", "Aeroklas Duys", "DeadLock"], ["2026-10-20", "Baker Donelson", "REDACT"], ["2026-10-20", "Ultimate Health Plans", "LockBit"], ["2026-10-20", "Finzly", "n0n"], ["2026-10-20", "Memorial Hermann Endoscopy Center Kingwood", "n0n"], ["2026-10-19", "Amagi", "n0n"], ["2026-10-17", "Genesys", "SCARLETTGROUP"], ["2026-10-17", "ONEOK, Inc.", "REDACT"], ["2026-10-16", "Canva", "TheSevenDeadlySins"], ["2026-10-16", "Hospital Sírio-Libanês", "TheSevenDeadlySins"], ["2026-10-16", "Karix", "LockBit"], ["2026-10-15", "ODC Ltd", "KAIROS"], ["2026-10", "The Japan Times", "Eclipse"], ["2026-10", "Titus Germany", "Play"], ["2026-10", "Granja Avícola La Ponderosa", "Emperador"], ["2026-10", "Ömür Hırdavat", "Emperador"], ["2026-09-01", "Nutex Health", "Unnamed group"]]};
+
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const shortType = { credentials: "Stolen credentials", "third-party": "Third-party / supply chain", unpatched: "Unpatched / zero-day", "social-engineering": "Social engineering", exposure: "Exposure / misconfig", ot: "OT / physical", undisclosed: "Not disclosed" };
+const statusClass = (s) => s.startsWith("Confirmed") ? "confirmed" : s.startsWith("Partially") ? "partial" : s.startsWith("Claimed") ? "claimed" : "";
+const ease = (t) => 1 - Math.pow(1 - t, 3);
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+
+// ---------- ordered (Bayer 8x8) dithering ----------
+const BAYER = [0,32,8,40,2,34,10,42,48,16,56,24,50,18,58,26,12,44,4,36,14,46,6,38,60,28,52,20,62,30,54,22,3,35,11,43,1,33,9,41,51,19,59,27,49,17,57,25,15,47,7,39,13,45,5,37,63,31,55,23,61,29,53,21].map((v) => (v + 0.5) / 64);
+const thr = (x, y) => BAYER[(y & 7) * 8 + (x & 7)];
+
+// Tileable dither masks for CSS (brand glyph, bullets, the dithered headline word)
+function tile(level) {
+  const c = document.createElement("canvas"); c.width = c.height = 8;
+  const g = c.getContext("2d"), im = g.createImageData(8, 8);
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) if (level > thr(x, y)) im.data[(y * 8 + x) * 4 + 3] = 255;
+  g.putImageData(im, 0, 0);
+  return `url(${c.toDataURL()})`;
+}
+document.documentElement.style.setProperty("--px", tile(0.5));
+document.documentElement.style.setProperty("--dz", tile(0.8));
+
+// ABGR packing for little-endian Uint32 pixel writes
+const rgba = (r, g, b, a = 255) => ((a << 24) | (b << 16) | (g << 8) | r) >>> 0;
+const PAL = [rgba(44, 44, 50), rgba(96, 96, 104), rgba(255, 77, 79), rgba(140, 40, 42)];
+
+// Render a dithered field into a canvas: fn(nx, ny, x, y) -> [level 0..1, palette index]
+function ditherCanvas(canvas, px, fn) {
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w || !h) return;
+  const cols = Math.ceil(w / px), rows = Math.ceil(h / px);
+  let s = canvas._s;
+  if (!s || s.cols !== cols || s.rows !== rows) {
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    const off = document.createElement("canvas"); off.width = cols; off.height = rows;
+    const img = new ImageData(cols, rows);
+    s = canvas._s = { cols, rows, off, img, u32: new Uint32Array(img.data.buffer) };
+  }
+  const { u32 } = s;
+  for (let y = 0; y < rows; y++) {
+    const ny = y / rows, o = y * cols;
+    for (let x = 0; x < cols; x++) {
+      const r = fn(x / cols, ny, x, y);
+      u32[o + x] = r[0] > thr(x, y) ? PAL[r[1]] : 0;
+    }
+  }
+  s.off.getContext("2d").putImageData(s.img, 0, 0);
+  const g = canvas.getContext("2d");
+  g.imageSmoothingEnabled = false;
+  g.clearRect(0, 0, canvas.width, canvas.height);
+  g.drawImage(s.off, 0, 0, cols * px * dpr, rows * px * dpr);
+}
+
+// Run fn(t) every frame only while the element is on screen
+function whileVisible(el, fn) {
+  let run = false, t0 = performance.now();
+  const loop = (now) => { fn((now - t0) / 1000); if (run) requestAnimationFrame(loop); };
+  const set = (v) => { if (v && !run && !reduce) { run = true; requestAnimationFrame(loop); } else if (!v) run = false; };
+  let vis = false;
+  new IntersectionObserver(([e]) => set((vis = e.isIntersecting) && !document.hidden)).observe(el);
+  document.addEventListener("visibilitychange", () => set(vis && !document.hidden));
+  addEventListener("resize", () => !run && fn((performance.now() - t0) / 1000));
+  fn(0);
+}
+
+// ---------- hero field: drifting interference + red breach pulses + cursor lamp ----------
+(function hero() {
+  const cv = $("#field");
+  let mx = 0.5, my = 0.42, tmx = 0.5, tmy = 0.42;
+  const small = innerWidth < 640;
+  const nodes = Array.from({ length: small ? 4 : 8 }, () => ({ x: Math.random(), y: 0.12 + Math.random() * 0.76, p: Math.random() * 5, s: 3.5 + Math.random() * 3, last: 0 }));
+  addEventListener("pointermove", (e) => { const r = cv.getBoundingClientRect(); tmx = (e.clientX - r.left) / r.width; tmy = (e.clientY - r.top) / r.height; }, { passive: true });
+  whileVisible(cv, (t) => {
+    mx += (tmx - mx) * 0.06; my += (tmy - my) * 0.06;
+    const ar = cv.clientWidth / Math.max(1, cv.clientHeight);
+    for (const n of nodes) {
+      const cyc = Math.floor((t + n.p) / n.s);
+      if (cyc !== n.last) { n.last = cyc; n.x = Math.random(); n.y = 0.12 + Math.random() * 0.76; }
+      n.ph = ((t + n.p) % n.s) / n.s;
+    }
+    ditherCanvas(cv, small ? 3 : 4, (nx, ny) => {
+      const x = nx * ar;
+      let v = 0.5 + 0.28 * Math.sin(x * 5.2 + t * 0.35) * Math.cos(ny * 4.4 - t * 0.27) + 0.22 * Math.sin((x + ny) * 8 - t * 0.5);
+      const dx = (nx - 0.5) * ar * 1.2, dy = (ny - 0.48) * 1.7;
+      const mask = clamp((Math.sqrt(dx * dx + dy * dy) - 0.34) / 0.55);
+      v *= 0.44 * mask;
+      const cdx = (nx - mx) * ar, cdy = ny - my;
+      v += Math.exp(-(cdx * cdx + cdy * cdy) / 0.02) * 0.36 * (0.3 + mask * 0.7);
+      let tone = v > 0.42 ? 1 : 0;
+      for (const n of nodes) {
+        const ndx = (nx - n.x) * ar, ndy = ny - n.y, nd = Math.sqrt(ndx * ndx + ndy * ndy);
+        const band = Math.max(0, 1 - Math.abs(nd - n.ph * (small ? 0.18 : 0.3)) / 0.013) * (1 - n.ph) * mask;
+        if (band > 0.04) { v = Math.max(v, band * 0.95); tone = n.ph > 0.55 ? 3 : 2; }
+        else if (nd < 0.007 && n.ph < 0.8) { v = 1; tone = 2; }
+      }
+      return [v, tone];
+    });
+  });
+})();
+
+// ---------- nav, repo links, dates ----------
+const nav = $("#nav");
+addEventListener("scroll", () => nav.classList.toggle("solid", scrollY > 40), { passive: true });
+$$(".repo").forEach((a) => (a.href = DATA.repo));
+const fmtDate = (d) => new Date(d + "T00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+$("#asof").textContent = `Live index · 1 Sep — ${fmtDate(DATA.asOf)}`;
+$("#asof2").textContent = fmtDate(DATA.asOf);
+
+// ---------- reveal on scroll ----------
+const io = new IntersectionObserver((es) => es.forEach((e) => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add("in"); e.target.dispatchEvent(new Event("reveal")); io.unobserve(e.target);
+}), { rootMargin: "0px 0px -8% 0px" });
+const reveal = (el, d = 0) => { el.setAttribute("data-reveal", ""); el.style.setProperty("--d", d + "s"); io.observe(el); };
+$$("[data-reveal]").forEach((el) => io.observe(el));
+const onReveal = (el, fn) => el.addEventListener("reveal", fn, { once: true });
+
+// ---------- stats (count up) ----------
+const known = DATA.incidents.filter((i) => i.category !== "undisclosed").length;
+const stats = [
+  { v: DATA.incidents.length, f: (n) => Math.round(n), s: "incidents documented" },
+  { v: DATA.campaigns.length, f: (n) => Math.round(n), s: "multi-victim campaigns" },
+  { v: 387.5, f: (n) => "$" + n.toFixed(1) + "M", s: "largest theft (Bitget)" },
+  { v: Math.round((DATA.incidents.length - known) / DATA.incidents.length * 100), f: (n) => Math.round(n) + "%", s: "entry vector undisclosed" },
+];
+$("#stats").innerHTML = stats.map((s) => `<div class="stat"><b>${s.f(reduce ? s.v : 0)}</b><small>${s.s}</small></div>`).join("");
+$$(".stat").forEach((el, i) => {
+  reveal(el, i * 0.08);
+  onReveal(el, () => {
+    if (reduce) return;
+    const b = el.querySelector("b"), s = stats[i], t0 = performance.now() + i * 80;
+    (function tick(now) { const p = clamp((now - t0) / 1400); b.textContent = s.f(s.v * ease(p)); if (p < 1) requestAnimationFrame(tick); })(performance.now());
+  });
+});
+
+// ---------- why ----------
+$("#whyList").innerHTML = DATA.why.map((w) => `<li><div><h3>${esc(w.t)}</h3><p>${esc(w.d)}</p></div><p class="fix">${esc(w.f)}</p></li>`).join("");
+$$(".why li").forEach((el, i) => reveal(el, i * 0.06));
+
+// ---------- charts ----------
+const counts = DATA.incidents.reduce((m, i) => (m[i.category] = (m[i.category] || 0) + 1, m), {});
+const cats = Object.keys(shortType).filter((k) => counts[k]).sort((a, b) => counts[b] - counts[a]);
+const maxC = Math.max(...Object.values(counts));
+$("#vecSub").textContent = `${known} of ${DATA.incidents.length} have a known entry vector`;
+$("#bars").innerHTML = cats.map((k) => `<div class="bar" data-k="${k}"><span>${shortType[k]}</span><canvas></canvas><span>${counts[k]}</span></div>`).join("");
+const animate = (dur, fn, delay = 0) => { const t0 = performance.now() + delay; (function f(now) { const p = clamp((now - t0) / dur); fn(p); if (p < 1) requestAnimationFrame(f); })(performance.now()); };
+
+$$(".bar").forEach((el) => {
+  const cv = el.querySelector("canvas"), k = el.dataset.k, target = counts[k] / maxC, tone = k === "undisclosed" ? 1 : 2;
+  let frac = reduce ? target : 0, wave = -1;
+  const draw = () => ditherCanvas(cv, 2, (nx) => {
+    if (nx > frac) return [0, 0];
+    const p = nx / Math.max(frac, 1e-3);
+    let lvl = 0.96 - p * 0.58;
+    if (wave >= 0) lvl += Math.max(0, 1 - Math.abs(p - wave) * 6) * 0.35;
+    return [lvl, tone];
+  });
+  draw();
+  addEventListener("resize", draw);
+  el.addEventListener("click", () => { setFilter(k); $("#incidents").scrollIntoView({ behavior: reduce ? "auto" : "smooth" }); });
+  el.addEventListener("pointerenter", () => !reduce && animate(700, (p) => { wave = p < 1 ? p * 1.2 : -1; draw(); }));
+  onReveal(el.closest(".panel"), () => !reduce && animate(1100, (p) => { frac = target * ease(p); draw(); }, cats.indexOf(k) * 70));
+});
+
+const start = new Date("2026-09-01T00:00");
+const nW = Math.max(1, Math.ceil(((new Date(DATA.asOf + "T00:00") - start) / 864e5 + 1) / 7));
+const weeks = Array(nW).fill(0);
+DATA.incidents.forEach((i) => { const w = Math.floor((new Date(i.date + "T00:00") - start) / 864e5 / 7); if (w >= 0 && w < nW) weeks[w]++; });
+const maxW = Math.max(...weeks);
+$("#weekAxis").innerHTML = weeks.map((_, w) => new Date(start.getTime() + w * 7 * 864e5).toLocaleDateString("en-US", { month: "short", day: "numeric" })).filter((_, w) => w % 2 === 0).map((s) => `<span>${s}</span>`).join("");
+const wc = $("#weeks");
+let grow = reduce ? 1 : 0;
+const drawWeeks = () => ditherCanvas(wc, 3, (nx, ny) => {
+  const w = Math.min(nW - 1, Math.floor(nx * nW)), local = nx * nW - w;
+  if (local < 0.12 || local > 0.88) return [0, 0];
+  const h = (weeks[w] / maxW) * grow * 0.92, top = 1 - h;
+  if (ny < top) return [ny > 0.985 ? 1 : 0, 0];
+  return [0.97 - ((ny - top) / Math.max(h, 1e-3)) * 0.6, w >= nW - 3 ? 2 : 1];
+});
+drawWeeks();
+addEventListener("resize", drawWeeks);
+onReveal(wc.closest(".panel"), () => !reduce && animate(1300, (p) => { grow = ease(p); drawWeeks(); }, 150));
+
+// ---------- incidents ----------
+let active = "all";
+const chipDefs = [["all", "All", DATA.incidents.length], ...Object.keys(shortType).filter((k) => counts[k]).map((k) => [k, shortType[k], counts[k]])];
+$("#chips").innerHTML = chipDefs.map(([k, l, n]) => `<button class="chip" data-k="${k}" aria-pressed="${k === "all"}">${l}<span>${n}</span></button>`).join("");
+function setFilter(k) {
+  active = k;
+  $$(".chip").forEach((c) => c.setAttribute("aria-pressed", c.dataset.k === k));
+  render();
+}
+$("#chips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (b) setFilter(b.dataset.k); });
+$("#q").addEventListener("input", render);
+addEventListener("keydown", (e) => {
+  if (e.key === "/" && document.activeElement !== $("#q")) { e.preventDefault(); $("#q").focus(); }
+  if (e.key === "Escape") $("#q").blur();
+});
+
+const specific = (i) => i.prevention.filter((p) => !p.startsWith("Use the baseline controls"));
+const li = (arr) => `<ul>${arr.map((p) => `<li>${esc(p)}</li>`).join("")}</ul>`;
+function render() {
+  const q = $("#q").value.trim().toLowerCase();
+  const rows = DATA.incidents
+    .filter((i) => active === "all" || i.category === active)
+    .filter((i) => !q || [i.name, i.sector, i.country, i.attacker, i.impact, i.what].join(" ").toLowerCase().includes(q))
+    .sort((a, b) => b.date.localeCompare(a.date));
+  $("#resultcount").textContent = `${rows.length} of ${DATA.incidents.length} incidents`;
+  $("#list").innerHTML = rows.length ? rows.map((i) => {
+    const sp = specific(i), base = DATA.categories[i.category].prevent;
+    return `
+    <div class="row" id="${i.slug}">
+      <button aria-expanded="false">
+        <span class="date">${i.date.slice(5).replace("-", "·")}</span>
+        <span class="name">${esc(i.name)}<small>${esc(i.sector)} · ${esc(i.country)}</small></span>
+        <span class="type">${shortType[i.category]}</span>
+        <span class="status ${statusClass(i.status)}">${esc(i.status.replace(" (unverified)", "").replace(" (secondary sources)", ""))}</span>
+        <span class="plus">+</span>
+      </button>
+      <div class="detail"><div><div class="detail-inner">
+        <div class="full meta"><span><b>When</b> ${esc(i.date_note)}</span><span><b>Attacker</b> ${esc(i.attacker)}</span><span><b>Status</b> ${esc(i.status)}</span></div>
+        <div><h4>What happened</h4><p>${esc(i.what)}</p></div>
+        <div><h4>Impact</h4><p>${esc(i.impact)}</p></div>
+        <div class="full rc"><h4>Root cause</h4><p>${esc(i.root_cause)}</p></div>
+        <div class="full"><h4>How it could have been prevented</h4>${li(sp.length ? sp : base)}</div>
+        ${sp.length ? `<div class="full baseline"><h4>Baseline for ${esc(shortType[i.category].toLowerCase())}</h4>${li(base)}</div>` : ""}
+        <div class="full sources"><h4>Sources</h4>${i.sources.map((s) => `<div><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)} ↗</a></div>`).join("")}</div>
+      </div></div></div>
+    </div>`;
+  }).join("") : `<div class="empty">No incidents match “${esc(q)}”.</div>`;
+  $$(".row").forEach((el, n) => reveal(el, Math.min(n, 10) * 0.03));
+}
+$("#list").addEventListener("click", (e) => {
+  const btn = e.target.closest(".row > button"); if (!btn) return;
+  const row = btn.parentElement, open = !row.classList.contains("open");
+  row.classList.toggle("open", open);
+  btn.setAttribute("aria-expanded", open);
+  if (open) history.replaceState(null, "", "#" + row.id);
+});
+render();
+
+// ---------- campaigns ----------
+$("#campaignGrid").innerHTML = DATA.campaigns.map((c) => `
+  <div class="card">
+    <canvas aria-hidden="true"></canvas>
+    <h3>${esc(c.name)}</h3>
+    <div class="when">${esc(c.period)}</div>
+    <p><b>Victims.</b> ${esc(c.victims)}</p>
+    <p><b>How.</b> ${esc(c.how)}</p>
+    <p><b>Prevent.</b> ${esc(c.prevent.join(" "))}</p>
+  </div>`).join("");
+$$(".card").forEach((el, i) => {
+  reveal(el, (i % 2) * 0.08);
+  const cv = el.querySelector("canvas"), seed = i * 1.7;
+  let t = 0;
+  const draw = () => ditherCanvas(cv, 3, (nx, ny) => [
+    Math.max(0, nx * 0.95 - 0.3 + 0.14 * Math.sin(ny * 8 + seed + t)) * 0.7,
+    nx > 0.9 && Math.sin(ny * 26 + seed - t * 2) > 0.8 ? 2 : 0,
+  ]);
+  draw();
+  addEventListener("resize", draw);
+  el.addEventListener("pointerenter", () => !reduce && animate(1400, (p) => { t = ease(p) * 3; draw(); }));
+});
+
+// ---------- playbook + claims ----------
+$("#top10").innerHTML = DATA.top10.map(([t, d]) => `<li><b>${esc(t)}</b>${esc(d)}</li>`).join("");
+$$(".top10 li").forEach((el, i) => reveal(el, (i % 2) * 0.06 + Math.floor(i / 2) * 0.04));
+$("#claimsBody").innerHTML = DATA.claims.map(([d, v, g]) => `<tr><td>${esc(d)}</td><td>${esc(v)}</td><td>${esc(g)}</td></tr>`).join("");
+
+// ---------- CTA field: concentric dithered ripples ----------
+(function oss() {
+  const cv = $("#ossField");
+  whileVisible(cv, (t) => ditherCanvas(cv, 4, (nx, ny) => {
+    const ar = cv.clientWidth / Math.max(1, cv.clientHeight);
+    const d = Math.hypot((nx - 0.5) * ar * 0.9, (ny - 0.5) * 1.1);
+    const ring = 0.5 + 0.5 * Math.sin(d * 22 - t * 1.3);
+    const fade = clamp((d - 0.42) / 0.45) * (1 - clamp((d - 1.1) / 0.4));
+    return [ring * fade * 0.5, ring > 0.97 && fade > 0.5 ? 1 : 0];
+  }));
+})();
+
+// ---------- deep link to an incident ----------
+if (location.hash && document.getElementById(location.hash.slice(1))?.classList.contains("row")) {
+  const r = document.getElementById(location.hash.slice(1));
+  r.classList.add("open", "in"); r.querySelector("button").setAttribute("aria-expanded", "true");
+  setTimeout(() => r.scrollIntoView({ block: "start" }), 60);
+}
+</script>
+</body>
+</html>
